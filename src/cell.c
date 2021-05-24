@@ -88,9 +88,9 @@ void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 	size_t x, y;
 	*pop = 0;
 
-	for (x=(size_t)(body_new->rows * 0.4); x < (size_t)(body_new->rows * 0.6); x++) {
-		for (y=(size_t)(body_new->cols * 0.4); y < (size_t)(body_new->cols * 0.6); y++) {
-			body_new->cells[x * body_new->cols + y]->alive = rand() & 1;
+	for (x=(size_t)(body_new->rows * 0.25); x < (size_t)(body_new->rows * 0.75); x++) {
+		for (y=(size_t)(body_new->cols * 0.25); y < (size_t)(body_new->cols * 0.75); y++) {
+			body_new->cells[x * body_new->cols + y]->alive = !(rand() % CELL_SPAWN_PROBABILITY);
 			*pop += body_new->cells[x * body_new->cols + y]->alive;
 		}
 	}
@@ -120,6 +120,8 @@ void compute_generation(body_t *body_new, body_t *body_old, int *pop)
 			if (!body_new->cells[i]->alive) {
 				if (neighbors == 3)
 					body_old->cells[i]->alive = 1;
+				else
+					body_old->cells[i]->alive = 0;
 			}
 			else {
 				if (neighbors == 3 || neighbors == 4)

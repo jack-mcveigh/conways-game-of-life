@@ -7,6 +7,7 @@
 #define CELL_COUNT 100
 #define CELL_WIDTH 5
 #define CELL_HEIGHT 5
+#define CELL_SPAWN_PROBABILITY 5 /* 1/n */
 
 typedef struct cell_s cell_t;
 struct cell_s {
@@ -20,8 +21,6 @@ struct body_s {
 	size_t cols;
 	cell_t **cells;
 };
-
-#define INIT_CELL(c) cell_t c = {.rect.w = CELL_WIDTH, .rect.h = CELL_HEIGHT, .alive = 0}
 
 static cell_t *cell_init(size_t width, size_t height);
 body_t *body_init(size_t rows, size_t cols);

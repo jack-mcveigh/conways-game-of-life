@@ -17,6 +17,8 @@ int main()
 	SDL_Renderer *renderer;
 	SDL_Event event;
 
+	srand(time(0));
+
 	/* Initialize bodies */
 	temp = malloc(sizeof(*temp));
 	body = body_init(CELL_COUNT, CELL_COUNT);
@@ -44,6 +46,8 @@ int main()
 	/* Main loop */
 	done = 0;
 	while (!done) {
+		printf("Current Population: %d\n", population);
+
 		/* Render */
 		SDL_RenderClear(renderer); /* Clear */
 		draw_generation(renderer, body); /* Draw */
@@ -57,7 +61,7 @@ int main()
 		body->cells = body_old->cells;
 		body_old->cells = temp;
 
-		SDL_Delay(500);
+		SDL_Delay(1000);
 
 		/* Poll for events */
 		while (SDL_PollEvent(&event))
