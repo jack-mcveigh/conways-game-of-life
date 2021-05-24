@@ -31,7 +31,7 @@ body_t *body_init(size_t rows, size_t cols)
 	body_new->rows = rows;
 	body_new->cols = cols;
 
-	body_new->cells = malloc(CELL_COUNT * sizeof(*body_new->cells));
+	body_new->cells = malloc(body_new->rows * body_new->cols * sizeof(*body_new->cells));
 	if (!body_new->cells) {
 		perror("body_init: Failed to malloc body_new->cells");
 		exit(EXIT_FAILURE);
@@ -88,46 +88,46 @@ void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 	size_t x, y;
 	*pop = 0;
 
-	for (x=(size_t)(CELL_COUNT * 0.25); x < (size_t)(CELL_COUNT * 0.75); x++)
-		for (y=(size_t)(CELL_COUNT * 0.25); y < (size_t)(CELL_COUNT * 0.75); y++) {
+	for (x=(size_t)(body_new->rows * 0.4); x < (size_t)(body_new->rows * 0.6); x++) {
+		for (y=(size_t)(body_new->cols * 0.4); y < (size_t)(body_new->cols * 0.6); y++) {
 			body_new->cells[x * body_new->cols + y]->alive = rand() & 1;
 			*pop += body_new->cells[x * body_new->cols + y]->alive;
 		}
-
-	memcpy(body_old->cells, body_new->cells, CELL_COUNT * CELL_COUNT * sizeof(*body_old->cells));
+	}
 }
 
 void compute_generation(body_t *body_new, body_t *body_old, int *pop)
 {
-	size_t x, y, a, b;
+	size_t x, y, a, b, i;
 	int neighbors;
 	*pop = 0;
 
-	for (x=0; x < CELL_COUNT; x++) {
-		for (y=0; y < CELL_COUNT; y++) {
+	for (x=0; x < body_new->rows; x++) {
+		for (y=0; y < body_new->cols; y++) {
 			neighbors = 0;
 
 			for (a=0; a < 3; a++) {
 				for (b=0; b < 3; b++) {
-					if (x - 1 + a < 0 || x - 1 + a > CELL_COUNT - 1 ||
-						y - 1 + b < 0 || y - 1 + b > CELL_COUNT - 1)
+					if (x - 1 + a < 0 || x - 1 + a > body_new->rows - 1 ||
+						y - 1 + b < 0 || y - 1 + b > body_new->cols - 1)
 						continue;
 
-					neighbors += body_new->cells[x - 1 + a + CELL_COUNT * (y - 1 + b)]->alive;
+					neighbors += body_new->cells[(x - 1 + a) * body_new->cols + (y - 1 + b)]->alive;
 				}
 			}
 
-			if (!body_new->cells[x + CELL_COUNT * y]->alive) {
+			i = x * body_new->cols + y;
+			if (!body_new->cells[i]->alive) {
 				if (neighbors == 3)
-					body_old->cells[x + CELL_COUNT * y]->alive = 1;
+					body_old->cells[i]->alive = 1;
 			}
 			else {
 				if (neighbors == 3 || neighbors == 4)
-					body_old->cells[x + CELL_COUNT * y]->alive = 1;
+					body_old->cells[i]->alive = 1;
 				else
-					body_old->cells[x + CELL_COUNT * y]->alive = 0;
+					body_old->cells[i]->alive = 0;
 			}
-			*pop += body_old->cells[x + CELL_COUNT * y]->alive;
+			*pop += body_old->cells[i]->alive;
 		}
 	}
 

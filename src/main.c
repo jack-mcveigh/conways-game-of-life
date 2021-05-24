@@ -11,16 +11,16 @@
 int main()
 {
 	int done, population;
-	body_t *body, *body_old, *body_temp;
+	cell_t **temp;
+	body_t *body, *body_old;
 	SDL_Window* window;
 	SDL_Renderer *renderer;
-	SDL_Event *event;
+	SDL_Event event;
 
-	srand(time(NULL));
-
+	/* Initialize bodies */
+	temp = malloc(sizeof(*temp));
 	body = body_init(CELL_COUNT, CELL_COUNT);
 	body_old = body_init(CELL_COUNT, CELL_COUNT);
-	body_temp = body_init(CELL_COUNT, CELL_COUNT);
 	inital_generation(body, body_old, &population);
 
 	/* Initialize window */
@@ -40,23 +40,37 @@ int main()
 	}
 	SDL_SetRenderDrawColor(renderer, 255, 240, 240, SDL_ALPHA_OPAQUE); /* salmon-ish */
 
+	printf("Starting main loop\n");
 	/* Main loop */
 	done = 0;
 	while (!done) {
-		SDL_PollEvent(event);
-		if (event->type == SDL_QUIT)
-			done = 1;
-
+		/* Render */
 		SDL_RenderClear(renderer); /* Clear */
 		draw_generation(renderer, body); /* Draw */
 		SDL_RenderPresent(renderer); /* Present drawing */
 
+		/* Compute next generation */
 		compute_generation(body, body_old, &population);
 
-		body_temp->cells = body->cells;
+		/* Ping-pong buffer */
+		temp = body->cells;
 		body->cells = body_old->cells;
-		body_old->cells = body_temp->cells;
+		body_old->cells = temp;
+
+		SDL_Delay(500);
+
+		/* Poll for events */
+		while (SDL_PollEvent(&event))
+			switch (event.type) {
+				case SDL_QUIT:
+					printf("Quiting\n");
+					done = 1;
+					break;
+			}
 	}
+
+	body_destory(body);
+	body_destory(body_old);
 
 	/* Destory program */
 	SDL_DestroyWindow(window);
