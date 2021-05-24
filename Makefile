@@ -5,7 +5,7 @@ BUILDDIR := build
 TARGET := game_of_life
 
 SRCEXT := c
-SOURCES := $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
+SOURCES := $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 CFLAGS := -g # -Wall
 INC := -I include `sdl2-config --cflags`
@@ -14,7 +14,7 @@ LIB := `sdl2-config --libs`
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."
 	@mkdir -p $(BINDIR)
-	@echo " $(CC) $^ -o $(BINDIR)/$(TARGET)"; $(CC) $(LIB) $^ -o $(BINDIR)/$(TARGET)
+	@echo " $(CC) $(LIB) $^ -o $(BINDIR)/$(TARGET)"; $(CC) $(LIB) $^ -o $(BINDIR)/$(TARGET)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
