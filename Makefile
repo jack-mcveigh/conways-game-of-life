@@ -7,9 +7,9 @@ TARGET := game_of_life
 SRCEXT := c
 SOURCES := $(shell find $(SRCDIR) -type f -name "*.$(SRCEXT)")
 OBJECTS := $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
-CFLAGS := -g # -Wall
-INC := -I include `sdl2-config --cflags`
-LIB := `sdl2-config --libs`
+CFLAGS := -g#-Wall
+INC := -I include -I /usr/local/include/SDL2
+LIB := -L /usr/local/lib -l SDL2 -l SDL2_ttf
 
 $(TARGET): $(OBJECTS)
 	@echo " Linking..."

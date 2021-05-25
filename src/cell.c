@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <stdio.h>
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 #include "cell.h"
 
@@ -39,7 +41,7 @@ body_t *body_init(size_t rows, size_t cols)
 
 	for (x = 0; x < body_new->rows; x++)
 		for (y = 0; y < body_new->cols; y++)
-			body_new->cells[x * body_new->cols + y] = cell_init(CELL_WIDTH, CELL_HEIGHT);
+			body_new->cells[x * body_new->cols + y] = cell_init(cell_width, cell_height);
 
 	return body_new;
 }
@@ -62,9 +64,10 @@ void body_destory(body_t *body)
 
 static int draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y)
 {
-	cell->rect.x = 5 * x;
-	cell->rect.y = 5 * y;
-	cell->rect.w = cell->rect.h = 5;
+	cell->rect.x = cell_width * x;
+	cell->rect.y = cell_height * y;
+	cell->rect.w = cell_width;
+	cell->rect.h = cell_height;
 
 	if (cell->alive)
 		SDL_SetRenderDrawColor(renderer, 204, 204, 255, SDL_ALPHA_OPAQUE);  /* purple-indigo-blue */
@@ -83,6 +86,53 @@ void draw_generation(SDL_Renderer *renderer, body_t *body)
 			draw_cell(renderer, body->cells[x * body->cols + y], x, y);
 }
 
+void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
+{
+	char text[124];
+	TTF_Font* font;
+	SDL_Surface* surface_message;
+	SDL_Texture* texture_message;
+	SDL_Rect message_rect;
+	SDL_Color color = {101, 101, 101}; /* Light Gray */
+
+	font = TTF_OpenFont("../assets/Arial.ttf", 18);
+	if (!font) {
+		printf("%s\n", TTF_GetError());
+		perror("display_body_statistics: TTF_OpenFont failed");
+		exit(EXIT_FAILURE);
+	}
+
+	sprintf(text, "Current Generation: %d    Current Population: %d", gen, pop);
+	surface_message = TTF_RenderText_Solid(font, text, color);
+	if (!surface_message) {
+		perror("display_body_statistics: TTF_RenderText_Solid failed");
+		exit(EXIT_FAILURE);
+	}
+
+	texture_message = SDL_CreateTextureFromSurface(renderer, surface_message);
+	if (!texture_message) {
+		perror("display_body_statistics: SDL_CreateTextureFromSurface failed");
+		exit(EXIT_FAILURE);
+	}
+
+	message_rect.x = 25;
+	message_rect.y = 25;
+	message_rect.w = 0;
+	message_rect.h = 0;
+	if (SDL_QueryTexture(texture_message, NULL, NULL, &message_rect.w, &message_rect.h) == -1) {
+		perror("display_body_statistics: SDL_QueryTexture failed");
+		exit(EXIT_FAILURE);
+	}
+
+	if (SDL_RenderCopy(renderer, texture_message, NULL, &message_rect) == -1) {
+		perror("display_body_statistics: SDL_RenderCopy failed to display the message");
+		exit(EXIT_FAILURE);
+	}
+
+	SDL_FreeSurface(surface_message);
+	SDL_DestroyTexture(texture_message);
+}
+
 void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 {
 	size_t x, y;
@@ -90,7 +140,7 @@ void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 
 	for (x=(size_t)(body_new->rows * 0.25); x < (size_t)(body_new->rows * 0.75); x++) {
 		for (y=(size_t)(body_new->cols * 0.25); y < (size_t)(body_new->cols * 0.75); y++) {
-			body_new->cells[x * body_new->cols + y]->alive = !(rand() % CELL_SPAWN_PROBABILITY);
+			body_new->cells[x * body_new->cols + y]->alive = !(rand() % CELL_SPAWN_PROBABILITY_DEFAULT);
 			*pop += body_new->cells[x * body_new->cols + y]->alive;
 		}
 	}
@@ -117,18 +167,12 @@ void compute_generation(body_t *body_new, body_t *body_old, int *pop)
 			}
 
 			i = x * body_new->cols + y;
-			if (!body_new->cells[i]->alive) {
-				if (neighbors == 3)
-					body_old->cells[i]->alive = 1;
-				else
-					body_old->cells[i]->alive = 0;
-			}
-			else {
-				if (neighbors == 3 || neighbors == 4)
-					body_old->cells[i]->alive = 1;
-				else
-					body_old->cells[i]->alive = 0;
-			}
+
+			body_old->cells[i]->alive = 0;
+			if ((!body_new->cells[i]->alive && neighbors == 3) ||
+				(neighbors == 3 || neighbors == 4))
+				body_old->cells[i]->alive = 1;
+
 			*pop += body_old->cells[i]->alive;
 		}
 	}
