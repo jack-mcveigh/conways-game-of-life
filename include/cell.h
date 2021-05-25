@@ -8,13 +8,24 @@
 #define CELL_COLS_DEFAULT 100
 #define CELL_WIDTH_DEFAULT 8
 #define CELL_HEIGHT_DEFAULT 8
+
+#define CELL_COLOR_R_DEFAULT 204
+#define CELL_COLOR_G_DEFAULT 204
+#define CELL_COLOR_B_DEFAULT 255
+
 #define CELL_SPAWN_PROBABILITY_DEFAULT 25
 
 extern int cell_rows;
 extern int cell_cols;
 extern int cell_width;
 extern int cell_height;
-extern int cell_alive_probability;
+extern int cell_alive_prob;
+extern int cell_color_r;
+extern int cell_color_g;
+extern int cell_color_b;
+extern int bg_color_r;
+extern int bg_color_g;
+extern int bg_color_b;
 
 typedef struct cell_s cell_t;
 struct cell_s {

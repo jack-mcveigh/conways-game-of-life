@@ -11,7 +11,13 @@ int cell_rows = CELL_ROWS_DEFAULT;
 int cell_cols = CELL_COLS_DEFAULT;
 int cell_width = CELL_WIDTH_DEFAULT;
 int cell_height = CELL_HEIGHT_DEFAULT;
-int cell_alive_probability = CELL_SPAWN_PROBABILITY_DEFAULT;
+int cell_alive_prob = CELL_SPAWN_PROBABILITY_DEFAULT;
+int cell_color_r = CELL_COLOR_R_DEFAULT;
+int cell_color_g = CELL_COLOR_G_DEFAULT;
+int cell_color_b = CELL_COLOR_B_DEFAULT;
+int bg_color_r = BACKGROUND_COLOR_R_DEFAULT;
+int bg_color_g = BACKGROUND_COLOR_G_DEFAULT;
+int bg_color_b = BACKGROUND_COLOR_G_DEFAULT;
 
 void print_usage(void);
 int parse_input(int argc, char *argv[]);
@@ -54,7 +60,7 @@ int main(int argc, char *argv[])
 		perror("main: Failed to create renderer");
 		exit(EXIT_FAILURE);
 	}
-	SDL_SetRenderDrawColor(renderer, 255, 240, 240, SDL_ALPHA_OPAQUE); /* salmon-ish */
+	SDL_SetRenderDrawColor(renderer, bg_color_r, bg_color_g, bg_color_b, SDL_ALPHA_OPAQUE); /* salmon-ish */
 
 	/* Main loop */
 	done = pause = generation = 0;

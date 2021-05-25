@@ -1,5 +1,6 @@
 # Conway's Game of Life implementation
 ## Author: Jack McVeigh <jmm826@drexel.edu>
+## License: Unlicense
 ---
 ---
 ## Purpose
@@ -31,3 +32,9 @@
 
 	* Run with custom cell alive probability (P%)
 `./game_of_life -p P`
+
+	* Set cell color (0xRRGGBB)
+`./game_of_life -c RRGGBB`
+
+	* Set background color (0xRRGGBB)
+`./game_of_life -b RRGGBB`

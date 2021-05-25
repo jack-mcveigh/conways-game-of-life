@@ -71,9 +71,9 @@ static int draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y)
 	cell->rect.h = cell_height;
 
 	if (cell->alive)
-		SDL_SetRenderDrawColor(renderer, 204, 204, 255, SDL_ALPHA_OPAQUE);  /* purple-indigo-blue */
+		SDL_SetRenderDrawColor(renderer, cell_color_r, cell_color_g, cell_color_b, SDL_ALPHA_OPAQUE);
 	else
-		SDL_SetRenderDrawColor(renderer, 255, 240, 240, SDL_ALPHA_OPAQUE);  /* salmon-ish */
+		SDL_SetRenderDrawColor(renderer, bg_color_r, bg_color_g, bg_color_b, SDL_ALPHA_OPAQUE);
 
 	return SDL_RenderFillRect(renderer, &cell->rect);
 }
@@ -106,7 +106,7 @@ void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 
 	for (x=(size_t)(body_new->rows * 0.25); x < (size_t)(body_new->rows * 0.75); x++) {
 		for (y=(size_t)(body_new->cols * 0.25); y < (size_t)(body_new->cols * 0.75); y++) {
-			body_new->cells[x * body_new->cols + y]->alive = ((rand() % 100 + 1) <= cell_alive_probability);
+			body_new->cells[x * body_new->cols + y]->alive = ((rand() % 100 + 1) <= cell_alive_prob);
 			*pop += body_new->cells[x * body_new->cols + y]->alive;
 		}
 	}

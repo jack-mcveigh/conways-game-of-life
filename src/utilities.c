@@ -16,6 +16,8 @@ void print_usage(void)
         printf("\t-n\t\t: Number of cells. (nxn)\n");
         printf("\t-d\t\t: Dimensions of the body matrix. (dxd)\n");
 	printf("\t-p\t\t: Probability of cell being alive. (p%%)\n");
+	printf("\t-c\t\t: Set cell color. (0xRRGGBB)\n");
+	printf("\t-b\t\t: Set background color. (0xRRGGBB)\n");
 }
 
 int parse_input(int argc, char *argv[])
@@ -24,7 +26,7 @@ int parse_input(int argc, char *argv[])
 	n = 0;
 	d = 0;
 
-	while((option = getopt(argc, argv, ":hn:d:p:")) != -1) { //get option from the getopt() method
+	while((option = getopt(argc, argv, ":hn:d:p:c:b:")) != -1) { //get option from the getopt() method
 		switch(option) {
 			case 'h': /* Print usage */
 				print_usage();
@@ -39,7 +41,17 @@ int parse_input(int argc, char *argv[])
 				cell_width = cell_height = atoi(optarg);
 				break;
 			case 'p': /* Alive Probability */
-				cell_alive_probability = atoi(optarg);
+				cell_alive_prob = atoi(optarg);
+				break;
+			case 'c': /* Cell color */
+				cell_color_r = (strtol(optarg, NULL, 16) >> 16) & 0xFF;
+				cell_color_g = (strtol(optarg, NULL, 16) >> 8) & 0xFF;
+				cell_color_b = strtol(optarg, NULL, 16) & 0xFF;
+				break;
+			case 'b': /* Background color */
+				bg_color_r = (strtol(optarg, NULL, 16) >> 16) & 0xFF;
+				bg_color_g = (strtol(optarg, NULL, 16) >> 8) & 0xFF;
+				bg_color_b = strtol(optarg, NULL, 16) & 0xFF;
 				break;
 			case ':': /* Needs value */
 				fprintf(stderr, "Option needs value.\n");
@@ -56,7 +68,7 @@ int parse_input(int argc, char *argv[])
 
 
 	assert((cell_width * cell_rows == WINDOW_WIDTH) && (cell_height * cell_cols == WINDOW_HEIGHT));
-	assert((cell_alive_probability < 100) && (cell_alive_probability > 0));
+	assert((cell_alive_prob < 100) && (cell_alive_prob > 0));
 
 	for(; optind < argc; optind++) { /* Extra args */
 		fprintf(stderr, "Invalid option %s.\n", argv[optind]);
