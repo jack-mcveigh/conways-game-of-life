@@ -4,6 +4,7 @@
 #include <SDL_ttf.h>
 
 #include "cell.h"
+#include "utilities.h"
 
 static cell_t *cell_init(size_t width, size_t height)
 {
@@ -89,48 +90,13 @@ void draw_generation(SDL_Renderer *renderer, body_t *body)
 void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
 {
 	char text[124];
-	TTF_Font* font;
-	SDL_Surface* surface_message;
-	SDL_Texture* texture_message;
-	SDL_Rect message_rect;
 	SDL_Color color = {101, 101, 101}; /* Light Gray */
 
-	font = TTF_OpenFont("../assets/Arial.ttf", 18);
-	if (!font) {
-		printf("%s\n", TTF_GetError());
-		perror("display_body_statistics: TTF_OpenFont failed");
-		exit(EXIT_FAILURE);
-	}
+	sprintf(text, "Current Generation: %d", gen);
+	display_text(renderer, text, color, 25, 25, 0, 0);
 
-	sprintf(text, "Current Generation: %d    Current Population: %d", gen, pop);
-	surface_message = TTF_RenderText_Solid(font, text, color);
-	if (!surface_message) {
-		perror("display_body_statistics: TTF_RenderText_Solid failed");
-		exit(EXIT_FAILURE);
-	}
-
-	texture_message = SDL_CreateTextureFromSurface(renderer, surface_message);
-	if (!texture_message) {
-		perror("display_body_statistics: SDL_CreateTextureFromSurface failed");
-		exit(EXIT_FAILURE);
-	}
-
-	message_rect.x = 25;
-	message_rect.y = 25;
-	message_rect.w = 0;
-	message_rect.h = 0;
-	if (SDL_QueryTexture(texture_message, NULL, NULL, &message_rect.w, &message_rect.h) == -1) {
-		perror("display_body_statistics: SDL_QueryTexture failed");
-		exit(EXIT_FAILURE);
-	}
-
-	if (SDL_RenderCopy(renderer, texture_message, NULL, &message_rect) == -1) {
-		perror("display_body_statistics: SDL_RenderCopy failed to display the message");
-		exit(EXIT_FAILURE);
-	}
-
-	SDL_FreeSurface(surface_message);
-	SDL_DestroyTexture(texture_message);
+	sprintf(text, "Population: %d", pop);
+	display_text(renderer, text, color, 25, 50, 0, 0);
 }
 
 void inital_generation(body_t *body_new, body_t *body_old, int *pop)

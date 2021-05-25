@@ -1,16 +1,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include <unistd.h>
-#include <assert.h>
 #include <SDL.h>
 #include <SDL_ttf.h>
 
+#include "utilities.h"
 #include "cell.h"
-
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 800
-#define DELAY_DEFAULT 1000
 
 int cell_rows = CELL_ROWS_DEFAULT;
 int cell_cols = CELL_COLS_DEFAULT;
@@ -114,57 +109,4 @@ int main(int argc, char *argv[])
 	SDL_Quit();
 
 	return 0;
-}
-
-void print_usage(void)
-{
-        printf("./game_of_life [ -h | [-n] [-d] ]\n");
-        printf("optional arguments:\n");
-        printf("\t-h\t\t: Print the usage statement.\n");
-        printf("\t-n\t\t: Number of cells. (nxn)\n");
-        printf("\t-d\t\t: Dimensions of the body matrix. (dxd)\n");
-}
-
-int parse_input(int argc, char *argv[])
-{
-	int option, n, d;
-	n = 0;
-	d = 0;
-
-	while((option = getopt(argc, argv, ":hn:d:")) != -1) { //get option from the getopt() method
-		switch(option) {
-			case 'h': /* Print usage */
-				print_usage();
-				exit(EXIT_SUCCESS);
-				break;
-			case 'n': /* Number of cells */
-				n = 1;
-				cell_rows = cell_cols = atoi(optarg);
-				break;
-			case 'd': /* Cell dimensions */
-				d = 1;
-				cell_width = cell_height = atoi(optarg);
-				break;
-			case ':': /* Needs value */
-				fprintf(stderr, "Option needs value.\n");
-				print_usage();
-				exit(EXIT_FAILURE);
-				break;
-			case '?': /* Unknown */
-				fprintf(stderr, "Invalid option.\n");
-				print_usage();
-				exit(EXIT_FAILURE);
-				break;
-		}
-	}
-
-	if (n && d)
-		assert((cell_width * cell_rows == WINDOW_WIDTH) && (cell_height * cell_cols == WINDOW_HEIGHT));
-
-	for(; optind < argc; optind++) { /* Extra args */
-		fprintf(stderr, "Invalid option %s.\n", argv[optind]);
-		print_usage();
-		exit(EXIT_FAILURE);
-	}
-        return 0;
 }
