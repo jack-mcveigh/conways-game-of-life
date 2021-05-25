@@ -8,12 +8,13 @@
 #define CELL_COLS_DEFAULT 100
 #define CELL_WIDTH_DEFAULT 8
 #define CELL_HEIGHT_DEFAULT 8
-#define CELL_SPAWN_PROBABILITY_DEFAULT 5 /* 1/n */
+#define CELL_SPAWN_PROBABILITY_DEFAULT 25
 
 extern int cell_rows;
 extern int cell_cols;
 extern int cell_width;
 extern int cell_height;
+extern int cell_alive_probability;
 
 typedef struct cell_s cell_t;
 struct cell_s {

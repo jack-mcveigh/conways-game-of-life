@@ -11,6 +11,7 @@ int cell_rows = CELL_ROWS_DEFAULT;
 int cell_cols = CELL_COLS_DEFAULT;
 int cell_width = CELL_WIDTH_DEFAULT;
 int cell_height = CELL_HEIGHT_DEFAULT;
+int cell_alive_probability = CELL_SPAWN_PROBABILITY_DEFAULT;
 
 void print_usage(void);
 int parse_input(int argc, char *argv[]);
@@ -96,6 +97,9 @@ int main(int argc, char *argv[])
 						case SDLK_DOWN:
 							if (delay_interval < (DELAY_DEFAULT * 4))
 								delay_interval += 100;
+							break;
+						case SDLK_q:
+							done = 1;
 							break;
 					}
 					break;

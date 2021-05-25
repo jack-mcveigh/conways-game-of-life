@@ -15,6 +15,7 @@ void print_usage(void)
         printf("\t-h\t\t: Print the usage statement.\n");
         printf("\t-n\t\t: Number of cells. (nxn)\n");
         printf("\t-d\t\t: Dimensions of the body matrix. (dxd)\n");
+	printf("\t-p\t\t: Probability of cell being alive. (p%%)\n");
 }
 
 int parse_input(int argc, char *argv[])
@@ -23,7 +24,7 @@ int parse_input(int argc, char *argv[])
 	n = 0;
 	d = 0;
 
-	while((option = getopt(argc, argv, ":hn:d:")) != -1) { //get option from the getopt() method
+	while((option = getopt(argc, argv, ":hn:d:p:")) != -1) { //get option from the getopt() method
 		switch(option) {
 			case 'h': /* Print usage */
 				print_usage();
@@ -36,6 +37,9 @@ int parse_input(int argc, char *argv[])
 			case 'd': /* Cell dimensions */
 				d = 1;
 				cell_width = cell_height = atoi(optarg);
+				break;
+			case 'p': /* Alive Probability */
+				cell_alive_probability = atoi(optarg);
 				break;
 			case ':': /* Needs value */
 				fprintf(stderr, "Option needs value.\n");
@@ -50,8 +54,9 @@ int parse_input(int argc, char *argv[])
 		}
 	}
 
-	if (n && d)
-		assert((cell_width * cell_rows == WINDOW_WIDTH) && (cell_height * cell_cols == WINDOW_HEIGHT));
+
+	assert((cell_width * cell_rows == WINDOW_WIDTH) && (cell_height * cell_cols == WINDOW_HEIGHT));
+	assert((cell_alive_probability < 100) && (cell_alive_probability > 0));
 
 	for(; optind < argc; optind++) { /* Extra args */
 		fprintf(stderr, "Invalid option %s.\n", argv[optind]);

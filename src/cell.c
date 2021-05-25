@@ -106,7 +106,7 @@ void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 
 	for (x=(size_t)(body_new->rows * 0.25); x < (size_t)(body_new->rows * 0.75); x++) {
 		for (y=(size_t)(body_new->cols * 0.25); y < (size_t)(body_new->cols * 0.75); y++) {
-			body_new->cells[x * body_new->cols + y]->alive = !(rand() % CELL_SPAWN_PROBABILITY_DEFAULT);
+			body_new->cells[x * body_new->cols + y]->alive = ((rand() % 100 + 1) <= cell_alive_probability);
 			*pop += body_new->cells[x * body_new->cols + y]->alive;
 		}
 	}
