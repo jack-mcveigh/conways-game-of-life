@@ -1,6 +1,7 @@
 # Conway's Game of Life implementation
-## Author: Jack McVeigh <jmm826@drexel.edu>
-## License: Unlicense
+## Author: Jack McVeigh
+### Email: <jmcveigh55@gmail.com>
+### License: Unlicense
 ---
 ---
 ## Purpose
@@ -8,9 +9,14 @@
 	* Explore SDL2.
 
 ## To Do
-	* Add paterns. Currently just creates random cells following the below rules:
-		1. Middle region of the grid. (50% of the board centered in the middle.)
-		2. Each cell in the region has a 1/5th chance of being alive to start.
+	* Add different modes:
+		1. Random (Default)
+		2. Patterns - Known groups like Gliders.
+		3. Drawing - Allow user to select cells with mouse click/drag.
+
+		- Currently only random is implemented with the below rules:
+			1. Middle region of the grid. (25% of the board centered in the middle.)
+			2. Each cell in the region has a probability that it will spawn in the alive state. The default is 25% but can be changed using the "-p" flag.
 
 ---
 
