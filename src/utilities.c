@@ -34,24 +34,24 @@ int parse_input(int argc, char *argv[])
 				break;
 			case 'n': /* Number of cells */
 				n = 1;
-				cell_rows = cell_cols = atoi(optarg);
+				cell_meta.rows = cell_meta.cols = atoi(optarg);
 				break;
 			case 'd': /* Cell dimensions */
 				d = 1;
-				cell_width = cell_height = atoi(optarg);
+				cell_meta.width = cell_meta.height = atoi(optarg);
 				break;
 			case 'p': /* Alive Probability */
-				cell_alive_prob = atoi(optarg);
+				cell_meta.alive_prob = atoi(optarg);
 				break;
 			case 'c': /* Cell color */
-				cell_color_r = (strtol(optarg, NULL, 16) >> 16) & 0xFF;
-				cell_color_g = (strtol(optarg, NULL, 16) >> 8) & 0xFF;
-				cell_color_b = strtol(optarg, NULL, 16) & 0xFF;
+				cell_meta.color_r = (strtol(optarg, NULL, 16) >> 16) & 0xFF;
+				cell_meta.color_g = (strtol(optarg, NULL, 16) >> 8) & 0xFF;
+				cell_meta.color_b = strtol(optarg, NULL, 16) & 0xFF;
 				break;
 			case 'b': /* Background color */
-				bg_color_r = (strtol(optarg, NULL, 16) >> 16) & 0xFF;
-				bg_color_g = (strtol(optarg, NULL, 16) >> 8) & 0xFF;
-				bg_color_b = strtol(optarg, NULL, 16) & 0xFF;
+				bg_meta.color_r = (strtol(optarg, NULL, 16) >> 16) & 0xFF;
+				bg_meta.color_g = (strtol(optarg, NULL, 16) >> 8) & 0xFF;
+				bg_meta.color_b = strtol(optarg, NULL, 16) & 0xFF;
 				break;
 			case ':': /* Needs value */
 				fprintf(stderr, "Option needs value.\n");
@@ -67,8 +67,8 @@ int parse_input(int argc, char *argv[])
 	}
 
 
-	assert((cell_width * cell_rows == WINDOW_WIDTH) && (cell_height * cell_cols == WINDOW_HEIGHT));
-	assert((cell_alive_prob < 100) && (cell_alive_prob > 0));
+	assert((cell_meta.width * cell_meta.rows == WINDOW_WIDTH) && (cell_meta.height * cell_meta.cols == WINDOW_HEIGHT));
+	assert((cell_meta.alive_prob < 100) && (cell_meta.alive_prob > 0));
 
 	for(; optind < argc; optind++) { /* Extra args */
 		fprintf(stderr, "Invalid option %s.\n", argv[optind]);

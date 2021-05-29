@@ -42,7 +42,7 @@ body_t *body_init(size_t rows, size_t cols)
 
 	for (x = 0; x < body_new->rows; x++)
 		for (y = 0; y < body_new->cols; y++)
-			body_new->cells[x * body_new->cols + y] = cell_init(cell_width, cell_height);
+			body_new->cells[x * body_new->cols + y] = cell_init(cell_meta.width, cell_meta.height);
 
 	return body_new;
 }
@@ -65,15 +65,15 @@ void body_destory(body_t *body)
 
 static int draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y)
 {
-	cell->rect.x = cell_width * x;
-	cell->rect.y = cell_height * y;
-	cell->rect.w = cell_width;
-	cell->rect.h = cell_height;
+	cell->rect.x = cell_meta.width * x;
+	cell->rect.y = cell_meta.height * y;
+	cell->rect.w = cell_meta.width;
+	cell->rect.h = cell_meta.height;
 
 	if (cell->alive)
-		SDL_SetRenderDrawColor(renderer, cell_color_r, cell_color_g, cell_color_b, SDL_ALPHA_OPAQUE);
+		SDL_SetRenderDrawColor(renderer, cell_meta.color_r, cell_meta.color_g, cell_meta.color_b, SDL_ALPHA_OPAQUE);
 	else
-		SDL_SetRenderDrawColor(renderer, bg_color_r, bg_color_g, bg_color_b, SDL_ALPHA_OPAQUE);
+		SDL_SetRenderDrawColor(renderer, bg_meta.color_r, bg_meta.color_g, bg_meta.color_b, SDL_ALPHA_OPAQUE);
 
 	return SDL_RenderFillRect(renderer, &cell->rect);
 }
@@ -106,7 +106,7 @@ void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 
 	for (x=(size_t)(body_new->rows * 0.25); x < (size_t)(body_new->rows * 0.75); x++) {
 		for (y=(size_t)(body_new->cols * 0.25); y < (size_t)(body_new->cols * 0.75); y++) {
-			body_new->cells[x * body_new->cols + y]->alive = ((rand() % 100 + 1) <= cell_alive_prob);
+			body_new->cells[x * body_new->cols + y]->alive = ((rand() % 100 + 1) <= cell_meta.alive_prob);
 			*pop += body_new->cells[x * body_new->cols + y]->alive;
 		}
 	}

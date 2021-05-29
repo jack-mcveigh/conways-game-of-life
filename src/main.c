@@ -7,17 +7,24 @@
 #include "utilities.h"
 #include "cell.h"
 
-int cell_rows = CELL_ROWS_DEFAULT;
-int cell_cols = CELL_COLS_DEFAULT;
-int cell_width = CELL_WIDTH_DEFAULT;
-int cell_height = CELL_HEIGHT_DEFAULT;
-int cell_alive_prob = CELL_SPAWN_PROBABILITY_DEFAULT;
-int cell_color_r = CELL_COLOR_R_DEFAULT;
-int cell_color_g = CELL_COLOR_G_DEFAULT;
-int cell_color_b = CELL_COLOR_B_DEFAULT;
-int bg_color_r = BACKGROUND_COLOR_R_DEFAULT;
-int bg_color_g = BACKGROUND_COLOR_G_DEFAULT;
-int bg_color_b = BACKGROUND_COLOR_G_DEFAULT;
+struct cell_meta_data cell_meta = {
+	.rows = CELL_ROWS_DEFAULT,
+	.cols = CELL_COLS_DEFAULT,
+	.width = CELL_WIDTH_DEFAULT,
+	.height = CELL_HEIGHT_DEFAULT,
+	.alive_prob = CELL_SPAWN_PROBABILITY_DEFAULT,
+	.color_r = CELL_COLOR_R_DEFAULT,
+	.color_g = CELL_COLOR_G_DEFAULT,
+	.color_b = CELL_COLOR_B_DEFAULT
+};
+
+struct background_meta_data bg_meta = {
+	.width = WINDOW_WIDTH,
+	.height = WINDOW_HEIGHT,
+	.color_r = BACKGROUND_COLOR_R_DEFAULT,
+	.color_g = BACKGROUND_COLOR_G_DEFAULT,
+	.color_b = BACKGROUND_COLOR_G_DEFAULT,
+};
 
 void print_usage(void);
 int parse_input(int argc, char *argv[]);
@@ -38,8 +45,8 @@ int main(int argc, char *argv[])
 
 	/* Initialize bodies */
 	temp = malloc(sizeof(*temp));
-	body = body_init(cell_rows, cell_cols);
-	body_old = body_init(cell_rows, cell_cols);
+	body = body_init(cell_meta.rows, cell_meta.cols);
+	body_old = body_init(cell_meta.rows, cell_meta.cols);
 	inital_generation(body, body_old, &population);
 
 	/* Initialize TTF */
@@ -49,7 +56,7 @@ int main(int argc, char *argv[])
 	SDL_Init(SDL_INIT_VIDEO);
 
 	window = SDL_CreateWindow("Conway's Game of Life - Jack McVeigh", SDL_WINDOWPOS_UNDEFINED,
-			SDL_WINDOWPOS_UNDEFINED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+			SDL_WINDOWPOS_UNDEFINED, bg_meta.width, bg_meta.height, SDL_WINDOW_OPENGL);
 	if (!window) {
 		perror("main: Failed to create window");
 		exit(EXIT_FAILURE);
@@ -60,7 +67,7 @@ int main(int argc, char *argv[])
 		perror("main: Failed to create renderer");
 		exit(EXIT_FAILURE);
 	}
-	SDL_SetRenderDrawColor(renderer, bg_color_r, bg_color_g, bg_color_b, SDL_ALPHA_OPAQUE); /* salmon-ish */
+	SDL_SetRenderDrawColor(renderer, bg_meta.color_r, bg_meta.color_g, bg_meta.color_b, SDL_ALPHA_OPAQUE); /* salmon-ish */
 
 	/* Main loop */
 	done = pause = generation = 0;

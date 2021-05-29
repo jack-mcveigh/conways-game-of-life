@@ -15,17 +15,17 @@
 
 #define CELL_SPAWN_PROBABILITY_DEFAULT 25
 
-extern int cell_rows;
-extern int cell_cols;
-extern int cell_width;
-extern int cell_height;
-extern int cell_alive_prob;
-extern int cell_color_r;
-extern int cell_color_g;
-extern int cell_color_b;
-extern int bg_color_r;
-extern int bg_color_g;
-extern int bg_color_b;
+struct cell_meta_data {
+	int rows;
+	int cols;
+	int width;
+	int height;
+	int alive_prob;
+	int color_r;
+	int color_g;
+	int color_b;
+};
+extern struct cell_meta_data cell_meta;
 
 typedef struct cell_s cell_t;
 struct cell_s {
