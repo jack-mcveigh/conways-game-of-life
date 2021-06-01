@@ -11,6 +11,8 @@
 #define BACKGROUND_COLOR_G_DEFAULT 240
 #define BACKGROUND_COLOR_B_DEFAULT 240
 
+extern char mode;
+
 struct background_meta_data {
 	int width;
 	int height;
@@ -20,7 +22,9 @@ struct background_meta_data {
 };
 extern struct background_meta_data bg_meta;
 
-void print_usage(void);
+static void print_usage(void);
+static void print_patterns(void);
+char *parse_pattern_choice(void);
 int parse_input(int argc, char *argv[]);
 void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, int y, int w, int h);
 

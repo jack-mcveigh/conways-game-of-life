@@ -99,10 +99,9 @@ void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
 	display_text(renderer, text, color, 25, 50, 0, 0);
 }
 
-void inital_generation(body_t *body_new, body_t *body_old, int *pop)
+static void random_mode(body_t *body_new, body_t *body_old, int *pop)
 {
 	size_t x, y;
-	*pop = 0;
 
 	for (x=(size_t)(body_new->rows * 0.25); x < (size_t)(body_new->rows * 0.75); x++) {
 		for (y=(size_t)(body_new->cols * 0.25); y < (size_t)(body_new->cols * 0.75); y++) {
@@ -110,6 +109,54 @@ void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 			*pop += body_new->cells[x * body_new->cols + y]->alive;
 		}
 	}
+}
+
+static void pattern_mode(body_t *body_new, body_t *body_old, int *pop)
+{
+	FILE *pattern_fd;
+	size_t len, x, y;
+	char *point;
+
+	/* TODO: Get file from user input */
+
+	pattern_fd = fopen("", "r");
+	if (!pattern_fd) {
+		perror("pattern_mode: Error opening patterm file");
+		exit(EXIT_FAILURE);
+	}
+
+	point = NULL;
+	getline(&point, &len, pattern_fd); /* Skip header */
+	while (getline(&point, &len, pattern_fd) != -1) {
+		point[strlen(point) - 1] = '\0';
+		x = (size_t)atoi(strtok(NULL, ","));
+		y = (size_t)atoi(strtok(NULL, ","));
+		body_new->cells[x * body_new->cols + y]->alive = 1;
+		*pop += 1;
+	}
+
+	fclose(pattern_fd);
+	free(point);
+}
+
+static void drawing_mode(body_t *body_new, body_t *body_old, int *pop)
+{
+	return;
+}
+
+void inital_generation(body_t *body_new, body_t *body_old, int *pop)
+{
+	*pop = 0;
+
+	switch (mode) {
+		case 'r':
+			random_mode(body_new, body_old, pop);
+			break;
+		case 'p':
+		case 'd':
+			fprintf(stderr, "initial_generation: mode %c is not implemented yet.\n", mode);
+	}
+
 }
 
 void compute_generation(body_t *body_new, body_t *body_old, int *pop)

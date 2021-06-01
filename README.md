@@ -2,8 +2,9 @@
 ## Author: Jack McVeigh
 ### Email: <jmcveigh55@gmail.com>
 ### License: Unlicense
+
 ---
----
+
 ## Purpose
 	* Implement John Conway's famous "Game of Life" simulation.
 	* Explore SDL2.
@@ -23,6 +24,7 @@
 ## Compile
 	* Make sure to have SDL2 and SDL2_ttf installed. If not, via homebrew try:
 `brew install SDL2 SDL2_ttf`
+	
 	* Complile the program, in the base directory run:
 `make`
 

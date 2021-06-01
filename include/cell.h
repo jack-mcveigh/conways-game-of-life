@@ -48,6 +48,9 @@ void body_destory(body_t *body);
 static int draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y);
 void draw_generation(SDL_Renderer *renderer, body_t *body);
 void display_body_statistics(SDL_Renderer *renderer, int gen, int pop);
+static void random_mode(body_t *body_new, body_t *body_old, int *pop);
+static void pattern_mode(body_t *body_new, body_t *body_old, int *pop);
+static void drawing_mode(body_t *body_new, body_t *body_old, int *pop);
 void inital_generation(body_t *body_new, body_t *body_old, int *pop);
 void compute_generation(body_t *body, body_t *body_old, int *pop);
 

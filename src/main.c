@@ -7,6 +7,8 @@
 #include "utilities.h"
 #include "cell.h"
 
+char mode = 'r';
+
 struct cell_meta_data cell_meta = {
 	.rows = CELL_ROWS_DEFAULT,
 	.cols = CELL_COLS_DEFAULT,

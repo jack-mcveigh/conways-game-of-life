@@ -8,7 +8,7 @@
 #include "utilities.h"
 #include "cell.h"
 
-void print_usage(void)
+static void print_usage(void)
 {
         printf("./game_of_life [ -h | [-n] [-d] ]\n");
         printf("optional arguments:\n");
@@ -20,14 +20,30 @@ void print_usage(void)
 	printf("\t-b\t\t: Set background color. (0xRRGGBB)\n");
 }
 
+static void print_patterns(void)
+{
+	/* TODO: Walk ../data/patterns for pattern options */
+
+	return;
+}
+
+char *parse_pattern_choice(void)
+{
+	print_patterns();
+
+	/* TODO: return the full path to the file that the user requested. */
+
+	return (char*)NULL;
+}
+
 int parse_input(int argc, char *argv[])
 {
 	int option, n, d;
 	n = 0;
 	d = 0;
 
-	while((option = getopt(argc, argv, ":hn:d:p:c:b:")) != -1) { //get option from the getopt() method
-		switch(option) {
+	while ((option = getopt(argc, argv, ":hn:d:p:c:b:")) != -1) { //get option from the getopt() method
+		switch (option) {
 			case 'h': /* Print usage */
 				print_usage();
 				exit(EXIT_SUCCESS);
@@ -53,6 +69,10 @@ int parse_input(int argc, char *argv[])
 				bg_meta.color_g = (strtol(optarg, NULL, 16) >> 8) & 0xFF;
 				bg_meta.color_b = strtol(optarg, NULL, 16) & 0xFF;
 				break;
+			case 'm': /* Background color */
+				mode = optarg[0];
+				assert(mode == 'r' || mode == 'p' || mode == 'd'); /* Invalid mode */
+				break;
 			case ':': /* Needs value */
 				fprintf(stderr, "Option needs value.\n");
 				print_usage();
@@ -67,8 +87,9 @@ int parse_input(int argc, char *argv[])
 	}
 
 
-	assert((cell_meta.width * cell_meta.rows == WINDOW_WIDTH) && (cell_meta.height * cell_meta.cols == WINDOW_HEIGHT));
-	assert((cell_meta.alive_prob < 100) && (cell_meta.alive_prob > 0));
+	assert((cell_meta.width * cell_meta.rows == WINDOW_WIDTH)
+	       && (cell_meta.height * cell_meta.cols == WINDOW_HEIGHT)); /* Invalid cell dims. */
+	assert((cell_meta.alive_prob < 100) && (cell_meta.alive_prob > 0)); /* Prob. must be percentage */
 
 	for(; optind < argc; optind++) { /* Extra args */
 		fprintf(stderr, "Invalid option %s.\n", argv[optind]);
@@ -85,7 +106,7 @@ void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, in
 	SDL_Texture* texture_message;
 	SDL_Rect message_rect;
 
-	font = TTF_OpenFont("../assets/Arial.ttf", 18);
+	font = TTF_OpenFont("../data/assets/Arial.ttf", 18);
 	if (!font) {
 		printf("%s\n", TTF_GetError());
 		perror("display_body_statistics: TTF_OpenFont failed");
