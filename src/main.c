@@ -7,6 +7,7 @@
 #include "utilities.h"
 #include "cell.h"
 
+char *proj_dir;
 char mode = 'r';
 
 struct cell_meta_data cell_meta = {

@@ -1,12 +1,79 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <assert.h>
+#include <dirent.h>
+#include <limits.h>
 #include <SDL.h>
 #include <SDL_ttf.h>
 
 #include "utilities.h"
 #include "cell.h"
+
+char *strlshift(char *str)
+{
+	int i;
+	int len = strlen(str);
+
+	for(i = 1; i < len; i++) {
+		str[i - 1] = str[i];
+	}
+
+	str[len-1] = '\0';
+	return str;
+}
+
+char *strremove(char *str, const char *sub, int trunc) {
+	char *p, *q, *r;
+    if ((q = r = strstr(str, sub)) != NULL) {
+        size_t len = strlen(sub);
+        while ((r = strstr(p = r + len, sub)) != NULL) {
+            while (p < r)
+                *q++ = *p++;
+        }
+	if (!trunc)
+		while((*q++ = *p++) != '\0');
+	else
+        	*q++ = '\0';
+    }
+    return str;
+}
+
+char *get_cwd(void)
+{
+	char* cwd;
+    	int size = sizeof(*cwd) * PATH_MAX;
+
+    	cwd = malloc(size);
+	if (getcwd(cwd, size) == NULL)
+		perror("get_current_working_path: getcwd() error");
+
+	return cwd;
+}
+
+char *get_proj_dir(char *command)
+{
+	char *cwd, *full;
+	char *temp = malloc(strlen(command));
+	strcpy(temp, command);
+
+	switch (command[0]) {
+		case '.': /* relative path*/
+			cwd = get_cwd();
+			full = malloc(strlen(cwd) + strlen(command) + 1);
+
+			strlshift(temp);
+			strcpy(full, cwd);
+			strcat(full, temp);
+
+			free(cwd);
+			free(temp);
+
+			return strremove(full, "/bin", 1);
+		case '/': /* absolute path */
+			return strremove(temp, "/bin", 1);
+	}
+	return temp;
+}
 
 static void print_usage(void)
 {
@@ -18,22 +85,47 @@ static void print_usage(void)
 	printf("\t-p\t\t: Probability of cell being alive. (p%%)\n");
 	printf("\t-c\t\t: Set cell color. (0xRRGGBB)\n");
 	printf("\t-b\t\t: Set background color. (0xRRGGBB)\n");
+	printf("\t-m\t\t: Select mode. (r: random, p: pattern, d: drawing)\n");
 }
 
-static void print_patterns(void)
+static void print_patterns(char *pattern_choices[])
 {
-	/* TODO: Walk ../data/patterns for pattern options */
+	int i;
 
-	return;
+	printf("Available Patterns:\n");
+
+	for (i=0; pattern_choices[i] != NULL; i++)
+		printf("\t%d: %s\n", i+1, pattern_choices[i]);
 }
 
 char *parse_pattern_choice(void)
 {
-	print_patterns();
+	int choice;
+	char *pattern_path;
+	char *pattern_rel_path;
+	char *pattern_choices[] = {
+		"/data/patterns/death/stick.csv",
+		"/data/patterns/oscillation/crosshair.csv",
+		"/data/patterns/stable/convergent/block.csv",
+		"/data/patterns/stable/convergent/circle.csv",
+		"/data/patterns/stable/convergent/oval.csv",
+		"/data/patterns/stable/divergent/glider.csv",
+		NULL
+	};
 
-	/* TODO: return the full path to the file that the user requested. */
+	print_patterns(pattern_choices);
+	printf("Please select a pattern: ");
+	scanf("%d", &choice);
+	choice--;
 
-	return (char*)NULL;
+	pattern_rel_path = malloc(strlen(pattern_choices[choice]));
+	strcpy(pattern_rel_path, pattern_choices[choice]);
+
+	pattern_path = malloc(strlen(proj_dir) + strlen(pattern_rel_path) + 1);
+	strcpy(pattern_path, proj_dir);
+	strcat(pattern_path, pattern_rel_path);
+
+	return pattern_path;
 }
 
 int parse_input(int argc, char *argv[])
@@ -42,12 +134,12 @@ int parse_input(int argc, char *argv[])
 	n = 0;
 	d = 0;
 
-	while ((option = getopt(argc, argv, ":hn:d:p:c:b:")) != -1) { //get option from the getopt() method
+	proj_dir = get_proj_dir(argv[0]);
+
+	while ((option = getopt(argc, argv, ":hn:d:p:c:b:m:")) != -1) {
 		switch (option) {
 			case 'h': /* Print usage */
-				print_usage();
-				exit(EXIT_SUCCESS);
-				break;
+				goto usage_and_exit;
 			case 'n': /* Number of cells */
 				n = 1;
 				cell_meta.rows = cell_meta.cols = atoi(optarg);
@@ -71,32 +163,47 @@ int parse_input(int argc, char *argv[])
 				break;
 			case 'm': /* Background color */
 				mode = optarg[0];
-				assert(mode == 'r' || mode == 'p' || mode == 'd'); /* Invalid mode */
+				if (mode != 'r' && mode != 'p' && mode != 'd') { /* Invalid mode */
+					fprintf(stderr, "Not a valid option (valid options are r: random, p: pattern, d: drawing).\n");
+					goto usage_and_exit;
+				}
 				break;
 			case ':': /* Needs value */
 				fprintf(stderr, "Option needs value.\n");
-				print_usage();
-				exit(EXIT_FAILURE);
-				break;
+				goto usage_and_exit;
 			case '?': /* Unknown */
 				fprintf(stderr, "Invalid option.\n");
-				print_usage();
-				exit(EXIT_FAILURE);
-				break;
+				goto usage_and_exit;
 		}
 	}
 
-
-	assert((cell_meta.width * cell_meta.rows == WINDOW_WIDTH)
-	       && (cell_meta.height * cell_meta.cols == WINDOW_HEIGHT)); /* Invalid cell dims. */
-	assert((cell_meta.alive_prob < 100) && (cell_meta.alive_prob > 0)); /* Prob. must be percentage */
+	if ((cell_meta.width * cell_meta.rows != WINDOW_WIDTH)
+	    || (cell_meta.height * cell_meta.cols != WINDOW_HEIGHT)) /* Invalid cell dims. */
+		goto usage_and_exit;
+	else if ((cell_meta.alive_prob > 100) || (cell_meta.alive_prob < 0)) /* Prob. must be percentage 0-100 */
+		goto usage_and_exit;
 
 	for(; optind < argc; optind++) { /* Extra args */
 		fprintf(stderr, "Invalid option %s.\n", argv[optind]);
-		print_usage();
-		exit(EXIT_FAILURE);
+		goto usage_and_exit;
 	}
         return 0;
+
+usage_and_exit:
+	print_usage();
+	exit(EXIT_FAILURE);
+}
+
+void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
+{
+	char text[124];
+	SDL_Color color = {101, 101, 101}; /* Light Gray */
+
+	sprintf(text, "Current Generation: %d", gen);
+	display_text(renderer, text, color, 25, 25, 0, 0);
+
+	sprintf(text, "Population: %d", pop);
+	display_text(renderer, text, color, 25, 50, 0, 0);
 }
 
 void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, int y, int w, int h)
@@ -105,13 +212,20 @@ void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, in
 	SDL_Surface* surface_message;
 	SDL_Texture* texture_message;
 	SDL_Rect message_rect;
+	char *font_path;
+	char font_rel_path[] = "/data/assets/Arial.ttf";
 
-	font = TTF_OpenFont("../data/assets/Arial.ttf", 18);
+	font_path = malloc(strlen(proj_dir) + strlen(font_rel_path) + 1);
+	strcpy(font_path, proj_dir);
+	strcat(font_path, font_rel_path);
+
+	font = TTF_OpenFont(font_path, 18);
 	if (!font) {
 		printf("%s\n", TTF_GetError());
 		perror("display_body_statistics: TTF_OpenFont failed");
 		exit(EXIT_FAILURE);
 	}
+	free(font_path);
 
 	surface_message = TTF_RenderText_Solid(font, text, color);
 	if (!surface_message) {
