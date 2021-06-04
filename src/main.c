@@ -9,6 +9,7 @@
 
 char *proj_dir;
 char mode = 'r';
+int step = 0;
 
 struct cell_meta_data cell_meta = {
 	.rows = CELL_ROWS_DEFAULT,
@@ -83,14 +84,17 @@ int main(int argc, char *argv[])
 			display_body_statistics(renderer, generation, population);
 			SDL_RenderPresent(renderer);
 
-			/* Compute next generation */
-			compute_generation(body, body_old, &population);
-			generation++;
-
 			/* Ping-pong buffer */
 			temp = body->cells;
 			body->cells = body_old->cells;
 			body_old->cells = temp;
+
+			/* Compute next generation */
+			compute_generation(body, body_old, &population);
+			generation++;
+
+			if (step)
+				pause = 1;
 		}
 
 		SDL_Delay(delay_interval);

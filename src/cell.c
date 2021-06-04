@@ -152,32 +152,30 @@ void inital_generation(body_t *body_new, body_t *body_old, int *pop)
 
 void compute_generation(body_t *body_new, body_t *body_old, int *pop)
 {
-	size_t x, y, a, b, i;
-	int neighbors;
+	int neighbors, x, y, a, b, i;
 	*pop = 0;
 
-	for (x=0; x < body_new->rows; x++) {
-		for (y=0; y < body_new->cols; y++) {
-			neighbors = 0;
+	for (x=0; x < body_old->rows; x++) {
+		for (y=0; y < body_old->cols; y++) {
+			i = x * body_old->cols + y;
+			neighbors = body_old->cells[i]->alive ? -1 : 0;
 
-			for (a=0; a < 3; a++) {
-				for (b=0; b < 3; b++) {
-					if (x - 1 + a < 0 || x - 1 + a > body_new->rows - 1 ||
-						y - 1 + b < 0 || y - 1 + b > body_new->cols - 1)
-						continue;
-
-					neighbors += body_new->cells[(x - 1 + a) * body_new->cols + (y - 1 + b)]->alive;
+			for (a=-1; a < 2; a++) {
+				for (b=-1; b < 2; b++) {
+					if (!(x + a < 0 || x + a > body_old->rows - 1 ||
+					    y + b < 0 || y + b > body_old->cols - 1))
+						neighbors += body_old->cells[(x + a) * body_old->cols + (y + b)]->alive;
 				}
 			}
 
-			i = x * body_new->cols + y;
+			if (body_old->cells[i]->alive && ((neighbors < 2) || (neighbors > 3)))
+				body_new->cells[i]->alive = 0;
+			else if (!body_old->cells[i]->alive && (neighbors == 3))
+				body_new->cells[i]->alive = 1;
+			else
+				body_new->cells[i]->alive = body_old->cells[i]->alive;
 
-			body_old->cells[i]->alive = 0;
-			if ((!body_new->cells[i]->alive && neighbors == 3) ||
-				(neighbors == 3 || neighbors == 4))
-				body_old->cells[i]->alive = 1;
-
-			*pop += body_old->cells[i]->alive;
+			*pop += body_new->cells[i]->alive;
 		}
 	}
 

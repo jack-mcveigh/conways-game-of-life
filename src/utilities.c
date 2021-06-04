@@ -80,6 +80,7 @@ static void print_usage(void)
         printf("./game_of_life [ -h | [-n] [-d] ]\n");
         printf("optional arguments:\n");
         printf("\t-h\t\t: Print the usage statement.\n");
+	printf("\t-s\t\t: Stepper mode, pause after each frame.\n");
         printf("\t-n\t\t: Number of cells. (nxn)\n");
         printf("\t-d\t\t: Dimensions of the body matrix. (dxd)\n");
 	printf("\t-p\t\t: Probability of cell being alive. (p%%)\n");
@@ -136,10 +137,13 @@ int parse_input(int argc, char *argv[])
 
 	proj_dir = get_proj_dir(argv[0]);
 
-	while ((option = getopt(argc, argv, ":hn:d:p:c:b:m:")) != -1) {
+	while ((option = getopt(argc, argv, ":hsn:d:p:c:b:m:")) != -1) {
 		switch (option) {
 			case 'h': /* Print usage */
 				goto usage_and_exit;
+			case 's': /* Step mode */
+				step = 1;
+				break;
 			case 'n': /* Number of cells */
 				n = 1;
 				cell_meta.rows = cell_meta.cols = atoi(optarg);

@@ -13,6 +13,7 @@
 
 extern char *proj_dir;
 extern char mode;
+extern int step;
 
 struct background_meta_data {
 	int width;
