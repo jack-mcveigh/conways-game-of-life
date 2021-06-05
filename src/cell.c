@@ -153,7 +153,7 @@ void draw_generation(SDL_Renderer *renderer, body_t *body)
  * body_old: pointer to the body that stores the previous generation of cells.
  * pop: pointer to the population count used for tracking the body's progress.
  */
-static void random_mode(body_t *body_new, body_t *body_old, int *pop)
+static body_t *random_mode(body_t *body_new, body_t *body_old, int *pop)
 {
 	size_t x, y;
 
@@ -163,6 +163,8 @@ static void random_mode(body_t *body_new, body_t *body_old, int *pop)
 			*pop += body_new->cells[x * body_new->cols + y]->alive;
 		}
 	}
+
+	return body_new;
 }
 
 /*
@@ -174,7 +176,7 @@ static void random_mode(body_t *body_new, body_t *body_old, int *pop)
  * body_old: pointer to the body that stores the previous generation of cells.
  * pop: pointer to the population count used for tracking the body's progress.
  */
-static void pattern_mode(body_t *body_new, body_t *body_old, int *pop)
+static body_t *pattern_mode(body_t *body_new, body_t *body_old, int *pop)
 {
 	FILE *pattern_fd;
 	size_t len, x, y;
@@ -183,11 +185,11 @@ static void pattern_mode(body_t *body_new, body_t *body_old, int *pop)
 	pattern = parse_pattern_choice();
 
 	pattern_fd = fopen(pattern, "r");
+	free(pattern);
 	if (!pattern_fd) {
 		perror("pattern_mode: Error opening pattern file");
-		exit(EXIT_FAILURE);
+		return NULL;
 	}
-	free(pattern);
 
 	point = NULL;
 	getline(&point, &len, pattern_fd); /* Skip header */
@@ -201,6 +203,8 @@ static void pattern_mode(body_t *body_new, body_t *body_old, int *pop)
 
 	fclose(pattern_fd);
 	free(point);
+
+	return body_new;
 }
 
 /*
@@ -212,9 +216,46 @@ static void pattern_mode(body_t *body_new, body_t *body_old, int *pop)
  * body_old: pointer to the body that stores the previous generation of cells.
  * pop: pointer to the population count used for tracking the body's progress.
  */
-static void drawing_mode(body_t *body_new, body_t *body_old, int *pop)
+static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body_new, body_t *body_old, int *pop)
 {
-	return;
+	int capturing_input, x, y;
+	SDL_Event event;
+
+	SDL_RenderClear(renderer);
+	SDL_RenderPresent(renderer);
+
+	capturing_input = 1;
+	while(capturing_input) {
+		/* Poll for events */
+		while (SDL_PollEvent(&event))
+			switch (event.type) {
+				case SDL_QUIT:
+					return NULL;
+				case SDL_KEYDOWN:
+					switch (event.key.keysym.sym) {
+						case SDLK_SPACE:
+							capturing_input = 0;
+							break;
+						case SDLK_q:
+							return NULL;
+					}
+					break;
+				case SDL_MOUSEBUTTONDOWN:
+					switch (event.button.button) {
+						case SDL_BUTTON_LEFT:
+							SDL_GetMouseState(&x, &y);
+							x /= cell_meta.width;
+							y /= cell_meta.height;
+							body_new->cells[x * body_new->cols + y]->alive = !body_new->cells[x * body_new->cols + y]->alive;
+							SDL_RenderClear(renderer);
+							draw_generation(renderer, body_new);
+							SDL_RenderPresent(renderer);
+							break;
+					}
+					break;
+			}
+	}
+	return body_new;
 }
 
 /*
@@ -226,21 +267,17 @@ static void drawing_mode(body_t *body_new, body_t *body_old, int *pop)
  * body_old: pointer to the body that stores the previous generation of cells.
  * pop: pointer to the population count used for tracking the body's progress.
  */
-void inital_generation(body_t *body_new, body_t *body_old, int *pop)
+body_t *inital_generation(SDL_Renderer *renderer, body_t *body_new, body_t *body_old, int *pop)
 {
 	*pop = 0;
 
 	switch (mode) {
-		case 'r':
-			random_mode(body_new, body_old, pop);
-			break;
-		case 'p':
-			pattern_mode(body_new, body_old, pop);
-			break;
-		case 'd':
-			fprintf(stderr, "initial_generation: mode %c is not implemented yet.\n", mode);
+		case 'r': return random_mode(body_new, body_old, pop);
+		case 'p': return pattern_mode(body_new, body_old, pop);
+		case 'd': return drawing_mode(renderer, body_new, body_old, pop);
 	}
 
+	return NULL;
 }
 
 /*
