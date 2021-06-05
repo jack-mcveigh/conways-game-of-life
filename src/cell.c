@@ -106,7 +106,7 @@ void body_destory(body_t *body)
  * x: the column of the cell.
  * y: the row of the cell.
  */
-static int draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y)
+static void draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y)
 {
 	cell->rect.x = cell_meta.width * x;
 	cell->rect.y = cell_meta.height * y;
@@ -118,7 +118,12 @@ static int draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y)
 	else
 		SDL_SetRenderDrawColor(renderer, bg_meta.color_r, bg_meta.color_g, bg_meta.color_b, SDL_ALPHA_OPAQUE);
 
-	return SDL_RenderFillRect(renderer, &cell->rect);
+	SDL_RenderFillRect(renderer, &cell->rect);
+
+	if (cell_meta.grid_on) {
+		SDL_SetRenderDrawColor(renderer, 215, 215, 215, SDL_ALPHA_OPAQUE);
+		SDL_RenderDrawRect(renderer, &cell->rect);
+	}
 }
 
 /*

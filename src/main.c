@@ -16,10 +16,11 @@ struct cell_meta_data cell_meta = {
 	.cols = CELL_COLS_DEFAULT,
 	.width = CELL_WIDTH_DEFAULT,
 	.height = CELL_HEIGHT_DEFAULT,
-	.alive_prob = CELL_SPAWN_PROBABILITY_DEFAULT,
+	.grid_on = CELL_GRID_DEFAULT,
 	.color_r = CELL_COLOR_R_DEFAULT,
 	.color_g = CELL_COLOR_G_DEFAULT,
-	.color_b = CELL_COLOR_B_DEFAULT
+	.color_b = CELL_COLOR_B_DEFAULT,
+	.alive_prob = CELL_SPAWN_PROBABILITY_DEFAULT
 };
 
 struct background_meta_data bg_meta = {
@@ -27,7 +28,7 @@ struct background_meta_data bg_meta = {
 	.height = WINDOW_HEIGHT,
 	.color_r = BACKGROUND_COLOR_R_DEFAULT,
 	.color_g = BACKGROUND_COLOR_G_DEFAULT,
-	.color_b = BACKGROUND_COLOR_G_DEFAULT,
+	.color_b = BACKGROUND_COLOR_G_DEFAULT
 };
 
 int main(int argc, char *argv[])

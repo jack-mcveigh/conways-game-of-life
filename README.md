@@ -35,6 +35,9 @@
 	* Stepper mode, pause after each frame:
 `./game_of_life -s`
 
+	* Turn the grid on:
+`./game_of_life -g`
+
 	* Run with custom cell size settings (NxN grid of DxD cells. Note N * D must equal 800.)
 `./game_of_life -n N -d D`
 

@@ -70,6 +70,7 @@ static void print_usage(void)
 	printf("\t-p\t\t: Probability of cell being alive. (p%%)\n");
 	printf("\t-c\t\t: Set cell color. (0xRRGGBB)\n");
 	printf("\t-b\t\t: Set background color. (0xRRGGBB)\n");
+	printf("\t-g\t\t: Grid on.\n");
 	printf("\t-m\t\t: Select mode. (r: random, p: pattern, d: drawing)\n");
 }
 
@@ -145,12 +146,15 @@ void parse_input(int argc, char *argv[])
 
 	proj_dir = get_proj_dir(argv[0]);
 
-	while ((option = getopt(argc, argv, ":hsn:d:p:c:b:m:")) != -1) {
+	while ((option = getopt(argc, argv, ":hsgn:d:p:c:b:m:")) != -1) {
 		switch (option) {
 			case 'h': /* Print usage */
 				goto usage_and_exit;
 			case 's': /* Step mode */
 				step = 1;
+				break;
+			case 'g': /* Grid on */
+				cell_meta.grid_on = 1;
 				break;
 			case 'n': /* Number of cells */
 				n = 1;
@@ -205,27 +209,6 @@ void parse_input(int argc, char *argv[])
 usage_and_exit:
 	print_usage();
 	exit(EXIT_FAILURE);
-}
-
-/*
- * Function:	display_body_statistics
- * ------------------------------------
- * Display the current generation and population.
- *
- * renderer: SDL_Renderer used for rendering the statistics.
- * gen: the current generation count.
- * pop: the current population count.
- */
-void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
-{
-	char text[124];
-	SDL_Color color = {101, 101, 101}; /* Light Gray */
-
-	sprintf(text, "Current Generation: %d", gen);
-	display_text(renderer, text, color, 25, 25, 0, 0);
-
-	sprintf(text, "Population: %d", pop);
-	display_text(renderer, text, color, 25, 50, 0, 0);
 }
 
 /*
@@ -289,4 +272,30 @@ void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, in
 
 	SDL_FreeSurface(surface_message);
 	SDL_DestroyTexture(texture_message);
+}
+
+/*
+ * Function:	display_body_statistics
+ * ------------------------------------
+ * Display the current generation and population.
+ *
+ * renderer: SDL_Renderer used for rendering the statistics.
+ * gen: the current generation count.
+ * pop: the current population count.
+ */
+void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
+{
+	char text[124];
+	SDL_Color color;
+
+	if (cell_meta.grid_on)
+		color.r = color.g = color.b = 0; /* Black */
+	else
+		color.r = color.g = color.b = 101; /* Light Gray */
+
+	sprintf(text, "Current Generation: %d", gen);
+	display_text(renderer, text, color, 25, 25, 0, 0);
+
+	sprintf(text, "Population: %d", pop);
+	display_text(renderer, text, color, 25, 50, 0, 0);
 }

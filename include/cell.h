@@ -8,6 +8,7 @@
 #define CELL_COLS_DEFAULT 100
 #define CELL_WIDTH_DEFAULT 8
 #define CELL_HEIGHT_DEFAULT 8
+#define CELL_GRID_DEFAULT 0
 
 #define CELL_COLOR_R_DEFAULT 204
 #define CELL_COLOR_G_DEFAULT 204
@@ -20,10 +21,11 @@ struct cell_meta_data {
 	int cols;
 	int width;
 	int height;
-	int alive_prob;
+	int grid_on;
 	int color_r;
 	int color_g;
 	int color_b;
+	int alive_prob;
 };
 extern struct cell_meta_data cell_meta;
 
@@ -45,7 +47,7 @@ body_t *body_init(size_t rows, size_t cols);
 static void cell_destroy(cell_t *cell);
 void body_destory(body_t *body);
 
-static int draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y);
+static void draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y);
 void draw_generation(SDL_Renderer *renderer, body_t *body);
 static void random_mode(body_t *body_new, body_t *body_old, int *pop);
 static void pattern_mode(body_t *body_new, body_t *body_old, int *pop);
