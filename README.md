@@ -11,13 +11,10 @@
 
 ## To Do
 	* Add different modes:
-		1. Random (Default)
-		2. Patterns - Known groups like Gliders.
+		1. Random (Default) DONE
+		2. Patterns - Known groups like Gliders. DONE
 		3. Drawing - Allow user to select cells with mouse click/drag.
-
-		- Currently only random is implemented with the below rules:
-			1. Middle region of the grid. (25% of the board centered in the middle.)
-			2. Each cell in the region has a probability that it will spawn in the alive state. The default is 25% but can be changed using the "-p" flag.
+	* Add grid option (-g).
 
 ---
 
@@ -35,6 +32,9 @@
 	* Run with default settings (100x100 grid of 8x8 cells):
 `./game_of_life`
 
+	* Stepper mode, pause after each frame:
+`./game_of_life -s`
+
 	* Run with custom cell size settings (NxN grid of DxD cells. Note N * D must equal 800.)
 `./game_of_life -n N -d D`
 
@@ -46,3 +46,14 @@
 
 	* Set background color (0xRRGGBB)
 `./game_of_life -b RRGGBB`
+
+	* Select mode. (r: random, p: pattern, d: drawing):
+**IMPLEMENTED**
+
+`./game_of_life -m r`
+
+`./game_of_life -m p`
+
+**NOT IMPLEMENTED**
+
+`./game_of_life -m d`
