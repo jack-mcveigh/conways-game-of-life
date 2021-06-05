@@ -30,9 +30,6 @@ struct background_meta_data bg_meta = {
 	.color_b = BACKGROUND_COLOR_G_DEFAULT,
 };
 
-void print_usage(void);
-int parse_input(int argc, char *argv[]);
-
 int main(int argc, char *argv[])
 {
 	uint32_t delay_interval;

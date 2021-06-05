@@ -9,6 +9,18 @@
 #include "utilities.h"
 #include "cell.h"
 
+/*
+ * Function:	strremove
+ * ----------------------
+ * Find substring in a string and remove it, tuncating the
+ * 	rest of the string if desired.
+ *
+ * str: the main string.
+ * sub: the desired substring to be removed.
+ * trunc: 1 if truncate the rest of the string, 0 if just remove substring.
+ *
+ * returns: pointer to the original string with the changes made.
+ */
 char *strremove(char *str, const char *sub, int trunc)
 {
 	char *p, *q, *r;
@@ -26,6 +38,15 @@ char *strremove(char *str, const char *sub, int trunc)
 	return str;
 }
 
+/*
+ * Function:	get_proj_dir
+ * -------------------------
+ * Get the project dir given the command call (argv[0]).
+ *
+ * command: the command from argv[0].
+ *
+ * returns: pointer to newly allocated string containing the project path.
+ */
 char *get_proj_dir(char *command)
 {
 	char *resolved_path = malloc(PATH_MAX);
@@ -33,6 +54,11 @@ char *get_proj_dir(char *command)
 	return strremove(resolved_path, "/bin", 1);
 }
 
+/*
+ * Function:	print_usage
+ * ------------------------
+ * Print the program usage.
+ */
 static void print_usage(void)
 {
         printf("./game_of_life [ -h | [-n] [-d] ]\n");
@@ -47,6 +73,14 @@ static void print_usage(void)
 	printf("\t-m\t\t: Select mode. (r: random, p: pattern, d: drawing)\n");
 }
 
+
+/*
+ * Function:	print_patterns
+ * ---------------------------
+ * Print the available pattens.
+ *
+ * pattern_choices: arracy containing the available patterns.
+ */
 static void print_patterns(char *pattern_choices[])
 {
 	int i;
@@ -57,6 +91,13 @@ static void print_patterns(char *pattern_choices[])
 		printf("\t%d: %s\n", i+1, pattern_choices[i]);
 }
 
+/*
+ * Function:	parse_pattern_choice
+ * ---------------------------------
+ * Get the pattern the user wants to use.
+ *
+ * returns: path to the pattern that the user selected.
+ */
 char *parse_pattern_choice(void)
 {
 	int choice;
@@ -75,7 +116,7 @@ char *parse_pattern_choice(void)
 	print_patterns(pattern_choices);
 	printf("Please select a pattern: ");
 	scanf("%d", &choice);
-	choice--;
+	choice--; /* map 1:n to 0:n-1 for array indexing */
 
 	pattern_rel_path = malloc(strlen(pattern_choices[choice]));
 	strcpy(pattern_rel_path, pattern_choices[choice]);
@@ -87,7 +128,16 @@ char *parse_pattern_choice(void)
 	return pattern_path;
 }
 
-int parse_input(int argc, char *argv[])
+
+/*
+ * Function:	parse_input
+ * ------------------------
+ * Parse the command line input
+ *
+ * argc: argument count.
+ * argv: array of argument strings.
+ */
+void parse_input(int argc, char *argv[])
 {
 	int option, n, d;
 	n = 0;
@@ -149,13 +199,23 @@ int parse_input(int argc, char *argv[])
 		fprintf(stderr, "Invalid option %s.\n", argv[optind]);
 		goto usage_and_exit;
 	}
-        return 0;
+
+	return;
 
 usage_and_exit:
 	print_usage();
 	exit(EXIT_FAILURE);
 }
 
+/*
+ * Function:	display_body_statistics
+ * ------------------------------------
+ * Display the current generation and population.
+ *
+ * renderer: SDL_Renderer used for rendering the statistics.
+ * gen: the current generation count.
+ * pop: the current population count.
+ */
 void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
 {
 	char text[124];
@@ -168,6 +228,18 @@ void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
 	display_text(renderer, text, color, 25, 50, 0, 0);
 }
 
+/*
+ * Function:	display_text
+ * -------------------------
+ * Display text on the window.
+ *
+ * renderer: SDL_Renderer used for rendering the text.
+ * color: the color for rendering the text.
+ * x: the column to start rendering the text.
+ * y: the row to start rendering the text.
+ * w: the width of the text box.
+ * h: the height of the text box.
+ */
 void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, int y, int w, int h)
 {
 	TTF_Font* font;
