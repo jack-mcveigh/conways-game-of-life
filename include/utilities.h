@@ -24,9 +24,7 @@ struct background_meta_data {
 };
 extern struct background_meta_data bg_meta;
 
-char *strlshift(char *str);
 char *strremove(char *str, const char *sub, int trunc);
-char *get_cwd(void);
 char *get_proj_dir(char *command);
 static void print_usage(void);
 static void print_patterns(char *pattern_choices[]);

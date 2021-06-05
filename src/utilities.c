@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <dirent.h>
+#include <string.h>
 #include <limits.h>
 #include <SDL.h>
 #include <SDL_ttf.h>
@@ -9,70 +9,28 @@
 #include "utilities.h"
 #include "cell.h"
 
-char *strlshift(char *str)
+char *strremove(char *str, const char *sub, int trunc)
 {
-	int i;
-	int len = strlen(str);
-
-	for(i = 1; i < len; i++) {
-		str[i - 1] = str[i];
-	}
-
-	str[len-1] = '\0';
-	return str;
-}
-
-char *strremove(char *str, const char *sub, int trunc) {
 	char *p, *q, *r;
-    if ((q = r = strstr(str, sub)) != NULL) {
-        size_t len = strlen(sub);
-        while ((r = strstr(p = r + len, sub)) != NULL) {
-            while (p < r)
-                *q++ = *p++;
-        }
-	if (!trunc)
-		while((*q++ = *p++) != '\0');
-	else
-        	*q++ = '\0';
-    }
-    return str;
-}
-
-char *get_cwd(void)
-{
-	char* cwd;
-    	int size = sizeof(*cwd) * PATH_MAX;
-
-    	cwd = malloc(size);
-	if (getcwd(cwd, size) == NULL)
-		perror("get_current_working_path: getcwd() error");
-
-	return cwd;
+	if ((q = r = strstr(str, sub)) != NULL) {
+		size_t len = strlen(sub);
+		while ((r = strstr(p = r + len, sub)) != NULL) {
+			while (p < r)
+			*q++ = *p++;
+		}
+		if (!trunc)
+			while((*q++ = *p++) != '\0');
+		else
+			*q++ = '\0';
+	}
+	return str;
 }
 
 char *get_proj_dir(char *command)
 {
-	char *cwd, *full;
-	char *temp = malloc(strlen(command));
-	strcpy(temp, command);
-
-	switch (command[0]) {
-		case '.': /* relative path*/
-			cwd = get_cwd();
-			full = malloc(strlen(cwd) + strlen(command) + 1);
-
-			strlshift(temp);
-			strcpy(full, cwd);
-			strcat(full, temp);
-
-			free(cwd);
-			free(temp);
-
-			return strremove(full, "/bin", 1);
-		case '/': /* absolute path */
-			return strremove(temp, "/bin", 1);
-	}
-	return temp;
+	char *resolved_path = malloc(PATH_MAX);
+	realpath(command, resolved_path);
+	return strremove(resolved_path, "/bin", 1);
 }
 
 static void print_usage(void)
