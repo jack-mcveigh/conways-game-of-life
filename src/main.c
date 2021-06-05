@@ -42,34 +42,33 @@ int main(int argc, char *argv[])
 	SDL_Event event;
 
 	srand(time(0));
-
 	parse_input(argc, argv);
 
-	/* Initialize bodies */
-	temp = malloc(sizeof(*temp));
-	body = body_init(cell_meta.rows, cell_meta.cols);
-	body_old = body_init(cell_meta.rows, cell_meta.cols);
-	inital_generation(body, body_old, &population);
+	if (TTF_Init()) /* Initialize TTF */
+		exit(EXIT_FAILURE);
 
-	/* Initialize TTF */
-	TTF_Init();
-
-	/* Initialize window */
-	SDL_Init(SDL_INIT_VIDEO);
+	if (SDL_Init(SDL_INIT_VIDEO)) /* Initialize window */
+		exit(EXIT_FAILURE);
 
 	window = SDL_CreateWindow("Conway's Game of Life - Jack McVeigh", SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED, bg_meta.width, bg_meta.height, SDL_WINDOW_OPENGL);
 	if (!window) {
 		perror("main: Failed to create window");
-		exit(EXIT_FAILURE);
+		goto destrory_window_exit;
 	}
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	if (!window) {
 		perror("main: Failed to create renderer");
-		exit(EXIT_FAILURE);
+		goto destrory_renderer_exit;
 	}
 	SDL_SetRenderDrawColor(renderer, bg_meta.color_r, bg_meta.color_g, bg_meta.color_b, SDL_ALPHA_OPAQUE); /* salmon-ish */
+
+	/* Initialize bodies */
+	body = body_init(cell_meta.rows, cell_meta.cols);
+	body_old = body_init(cell_meta.rows, cell_meta.cols);
+	if (!inital_generation(renderer, body, body_old, &population))
+		goto destroy_all_and_exit;
 
 	/* Main loop */
 	done = pause = generation = 0;
@@ -125,10 +124,15 @@ int main(int argc, char *argv[])
 	}
 
 	/* Destory program */
+destroy_all_and_exit:
 	body_destory(body);
 	body_destory(body_old);
+destrory_renderer_exit:
+	SDL_DestroyRenderer(renderer);
+destrory_window_exit:
 	SDL_DestroyWindow(window);
 	SDL_Quit();
+	TTF_Quit();
 
 	return 0;
 }
