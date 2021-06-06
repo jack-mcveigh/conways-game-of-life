@@ -49,10 +49,10 @@ void body_destory(body_t *body);
 
 static void draw_cell(SDL_Renderer *renderer, cell_t *cell, int x, int y);
 void draw_generation(SDL_Renderer *renderer, body_t *body);
-static body_t *random_mode(body_t *body_new, body_t *body_old, int *pop);
-static body_t *pattern_mode(body_t *body_new, body_t *body_old, int *pop);
-static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body_new, body_t *body_old, int *pop);
-body_t *inital_generation(SDL_Renderer *renderer, body_t *body_new, body_t *body_old, int *pop);
+static body_t *random_mode(body_t *body, int *pop);
+static body_t *pattern_mode(body_t *body, int *pop);
+static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body, int *pop);
+body_t *inital_generation(SDL_Renderer *renderer, body_t *body, int *pop);
 void compute_generation(body_t *body, body_t *body_old, int *pop);
 
 #endif /* _CELL_H_ */

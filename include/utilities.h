@@ -30,7 +30,9 @@ static void print_usage(void);
 static void print_patterns(char *pattern_choices[]);
 char *parse_pattern_choice(void);
 void parse_input(int argc, char *argv[]);
-void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, int y, int w, int h);
+void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int font_size, int x, int y, int w, int h);
 void display_body_statistics(SDL_Renderer *renderer, int gen, int pop);
+
+#define DISPLAY_STAT(renderer, text, color, height) display_text(renderer, text, color, 18, 25, height, 0, 0);
 
 #endif /* _UTILITIES_H_ */

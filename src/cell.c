@@ -149,22 +149,21 @@ void draw_generation(SDL_Renderer *renderer, body_t *body)
  * Default mode of cell generation, randomly assigns cells as alive in the center
  * 	1/4th of the body using a probability of being alive.
  *
- * body_new: pointer to the body that will store the updated cells.
- * body_old: pointer to the body that stores the previous generation of cells.
+ * body: pointer to the body that will store the updated cells.
  * pop: pointer to the population count used for tracking the body's progress.
  */
-static body_t *random_mode(body_t *body_new, body_t *body_old, int *pop)
+static body_t *random_mode(body_t *body, int *pop)
 {
 	size_t x, y;
 
-	for (x=(size_t)(body_new->cols * 0.25); x < (size_t)(body_new->cols * 0.75); x++) {
-		for (y=(size_t)(body_new->rows * 0.25); y < (size_t)(body_new->rows * 0.75); y++) {
-			body_new->cells[x * body_new->cols + y]->alive = ((rand() % 100 + 1) <= cell_meta.alive_prob);
-			*pop += body_new->cells[x * body_new->cols + y]->alive;
+	for (x=(size_t)(body->cols * 0.25); x < (size_t)(body->cols * 0.75); x++) {
+		for (y=(size_t)(body->rows * 0.25); y < (size_t)(body->rows * 0.75); y++) {
+			body->cells[x * body->cols + y]->alive = ((rand() % 100 + 1) <= cell_meta.alive_prob);
+			*pop += body->cells[x * body->cols + y]->alive;
 		}
 	}
 
-	return body_new;
+	return body;
 }
 
 /*
@@ -172,11 +171,10 @@ static body_t *random_mode(body_t *body_new, body_t *body_old, int *pop)
  * ------------------------
  * A mode of cell generation, given a pattern selected by the user, generate the cells.
  *
- * body_new: pointer to the body that will store the updated cells.
- * body_old: pointer to the body that stores the previous generation of cells.
+ * body: pointer to the body that will store the updated cells.
  * pop: pointer to the population count used for tracking the body's progress.
  */
-static body_t *pattern_mode(body_t *body_new, body_t *body_old, int *pop)
+static body_t *pattern_mode(body_t *body, int *pop)
 {
 	FILE *pattern_fd;
 	size_t len, x, y;
@@ -195,16 +193,16 @@ static body_t *pattern_mode(body_t *body_new, body_t *body_old, int *pop)
 	getline(&point, &len, pattern_fd); /* Skip header */
 	while (getline(&point, &len, pattern_fd) != -1) {
 		point[strlen(point) - 1] = '\0';
-		x = (size_t)atoi(strtok(point, ",")) + (body_new->cols * 0.5);
-		y = (size_t)atoi(strtok(NULL, ",")) + (body_new->rows * 0.5);
-		body_new->cells[x * body_new->cols + y]->alive = 1;
+		x = (size_t)atoi(strtok(point, ",")) + (body->cols * 0.5);
+		y = (size_t)atoi(strtok(NULL, ",")) + (body->rows * 0.5);
+		body->cells[x * body->cols + y]->alive = 1;
 		*pop += 1;
 	}
 
 	fclose(pattern_fd);
 	free(point);
 
-	return body_new;
+	return body;
 }
 
 /*
@@ -212,16 +210,21 @@ static body_t *pattern_mode(body_t *body_new, body_t *body_old, int *pop)
  * ------------------------
  * A mode of cell generation, user selects the cells to be alive and then starts simulation.
  *
- * body_new: pointer to the body that will store the updated cells.
- * body_old: pointer to the body that stores the previous generation of cells.
+ * renderer: SDL_Renderer used for rendering the window.
+ * body: pointer to the body that will store the updated cells.
  * pop: pointer to the population count used for tracking the body's progress.
  */
-static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body_new, body_t *body_old, int *pop)
+static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body, int *pop)
 {
-	int capturing_input, x, y;
+	int capturing_input, x, y, i;
 	SDL_Event event;
+	SDL_Color color = {0, 0, 0}; /* black */
+	char text[] = "DRAWING MODE";
 
 	SDL_RenderClear(renderer);
+	draw_generation(renderer, body);
+	display_body_statistics(renderer, 0, *pop);
+	display_text(renderer, text, color, 24, 25, 100, 0, 0);
 	SDL_RenderPresent(renderer);
 
 	capturing_input = 1;
@@ -241,21 +244,25 @@ static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body_new, body_t *bo
 					}
 					break;
 				case SDL_MOUSEBUTTONDOWN:
-					switch (event.button.button) {
-						case SDL_BUTTON_LEFT:
-							SDL_GetMouseState(&x, &y);
-							x /= cell_meta.width;
-							y /= cell_meta.height;
-							body_new->cells[x * body_new->cols + y]->alive = !body_new->cells[x * body_new->cols + y]->alive;
-							SDL_RenderClear(renderer);
-							draw_generation(renderer, body_new);
-							SDL_RenderPresent(renderer);
-							break;
+					if (event.button.button == SDL_BUTTON_LEFT) {
+						SDL_GetMouseState(&x, &y);
+						x /= cell_meta.width;
+						y /= cell_meta.height;
+						i = x * body->cols + y;
+
+						body->cells[i]->alive = !body->cells[i]->alive;
+						*pop += 2 * body->cells[i]->alive - 1;
+
+						SDL_RenderClear(renderer);
+						draw_generation(renderer, body);
+						display_body_statistics(renderer, 0, *pop);
+						display_text(renderer, text, color, 24, 25, 100, 0, 0);
+						SDL_RenderPresent(renderer);
 					}
 					break;
 			}
 	}
-	return body_new;
+	return body;
 }
 
 /*
@@ -263,18 +270,20 @@ static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body_new, body_t *bo
  * -------------------------------
  * The api for the selected mode to populate the initial body.
  *
- * body_new: pointer to the body that will store the updated cells.
- * body_old: pointer to the body that stores the previous generation of cells.
+ * renderer: SDL_Renderer used for rendering the window when drawing mode is selected.
+ * body: pointer to the body that will store the updated cells.
  * pop: pointer to the population count used for tracking the body's progress.
+ *
+ * returns: pointer to n
  */
-body_t *inital_generation(SDL_Renderer *renderer, body_t *body_new, body_t *body_old, int *pop)
+body_t *inital_generation(SDL_Renderer *renderer, body_t *body, int *pop)
 {
 	*pop = 0;
 
 	switch (mode) {
-		case 'r': return random_mode(body_new, body_old, pop);
-		case 'p': return pattern_mode(body_new, body_old, pop);
-		case 'd': return drawing_mode(renderer, body_new, body_old, pop);
+		case 'r': return random_mode(body, pop);
+		case 'p': return pattern_mode(body, pop);
+		case 'd': return drawing_mode(renderer, body, pop);
 	}
 
 	return NULL;

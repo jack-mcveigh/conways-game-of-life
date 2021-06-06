@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
 	/* Initialize bodies */
 	body = body_init(cell_meta.rows, cell_meta.cols);
 	body_old = body_init(cell_meta.rows, cell_meta.cols);
-	if (!inital_generation(renderer, body, body_old, &population))
+	if (!inital_generation(renderer, body, &population))
 		goto destroy_all_and_exit;
 
 	/* Main loop */

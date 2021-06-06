@@ -223,7 +223,7 @@ usage_and_exit:
  * w: the width of the text box.
  * h: the height of the text box.
  */
-void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, int y, int w, int h)
+void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int font_size, int x, int y, int w, int h)
 {
 	TTF_Font* font;
 	SDL_Surface* surface_message;
@@ -236,7 +236,7 @@ void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int x, in
 	strcpy(font_path, proj_dir);
 	strcat(font_path, font_rel_path);
 
-	font = TTF_OpenFont(font_path, 18);
+	font = TTF_OpenFont(font_path, font_size);
 	if (!font) {
 		printf("%s\n", TTF_GetError());
 		perror("display_body_statistics: TTF_OpenFont failed");
@@ -294,8 +294,8 @@ void display_body_statistics(SDL_Renderer *renderer, int gen, int pop)
 		color.r = color.g = color.b = 101; /* Light Gray */
 
 	sprintf(text, "Current Generation: %d", gen);
-	display_text(renderer, text, color, 25, 25, 0, 0);
+	DISPLAY_STAT(renderer, text, color, 25);
 
 	sprintf(text, "Population: %d", pop);
-	display_text(renderer, text, color, 25, 50, 0, 0);
+	DISPLAY_STAT(renderer, text, color, 50);
 }
