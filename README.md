@@ -10,7 +10,6 @@
 	* Explore SDL2.
 
 ## To Do
-	* Add export option.
 	* Add menu for selecting run mode.
 
 ---
@@ -54,3 +53,18 @@
 `./game_of_life -m p`
 
 `./game_of_life -m d`
+
+---
+
+## Controls
+	In Drawing Mode:
+	* SPACE : Continue to simulation.
+	* q : Quit and Exit.
+	* LEFT CLICK : Select cell.
+
+	During Simulation:
+	* SPACE : Pause/Unpause.
+	* q : Quit and Exit.
+	* UP ARROW : Speed up.
+	* DOWN ARROW : Slow down.
+	* e : Export current state as csv.

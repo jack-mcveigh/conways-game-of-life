@@ -5,3 +5,6 @@
 .vscode/
 build/
 bin/
+
+# Exports
+data/patterns/export/
