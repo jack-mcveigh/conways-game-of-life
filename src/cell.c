@@ -151,6 +151,8 @@ void draw_generation(SDL_Renderer *renderer, body_t *body)
  *
  * body: pointer to the body that will store the updated cells.
  * pop: pointer to the population count used for tracking the body's progress.
+ *
+ * returns: pointer to body with its initial conditions set.
  */
 static body_t *random_mode(body_t *body, int *pop)
 {
@@ -173,6 +175,8 @@ static body_t *random_mode(body_t *body, int *pop)
  *
  * body: pointer to the body that will store the updated cells.
  * pop: pointer to the population count used for tracking the body's progress.
+ *
+ * returns: pointer to body with its initial conditions set.
  */
 static body_t *pattern_mode(body_t *body, int *pop)
 {
@@ -213,6 +217,8 @@ static body_t *pattern_mode(body_t *body, int *pop)
  * renderer: SDL_Renderer used for rendering the window.
  * body: pointer to the body that will store the updated cells.
  * pop: pointer to the population count used for tracking the body's progress.
+ *
+ * returns: pointer to body with its initial conditions set.
  */
 static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body, int *pop)
 {
@@ -274,7 +280,7 @@ static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body, int *pop)
  * body: pointer to the body that will store the updated cells.
  * pop: pointer to the population count used for tracking the body's progress.
  *
- * returns: pointer to n
+ * returns: pointer to body with its initial conditions set.
  */
 body_t *inital_generation(SDL_Renderer *renderer, body_t *body, int *pop)
 {

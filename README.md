@@ -10,11 +10,8 @@
 	* Explore SDL2.
 
 ## To Do
-	* Add different modes:
-		1. Random (Default) DONE
-		2. Patterns - Known groups like Gliders. DONE
-		3. Drawing - Allow user to select cells with mouse click/drag.
-	* Add grid option (-g).
+	* Add export option.
+	* Add menu for selecting run mode.
 
 ---
 
@@ -51,12 +48,9 @@
 `./game_of_life -b RRGGBB`
 
 	* Select mode. (r: random, p: pattern, d: drawing):
-**IMPLEMENTED**
 
 `./game_of_life -m r`
 
 `./game_of_life -m p`
-
-**NOT IMPLEMENTED**
 
 `./game_of_life -m d`

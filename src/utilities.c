@@ -260,6 +260,7 @@ void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int font_
 	message_rect.y = y;
 	message_rect.w = w;
 	message_rect.h = h;
+
 	if (SDL_QueryTexture(texture_message, NULL, NULL, &message_rect.w, &message_rect.h) == -1) {
 		perror("display_body_statistics: SDL_QueryTexture failed");
 		exit(EXIT_FAILURE);
