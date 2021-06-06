@@ -50,6 +50,10 @@ char *strremove(char *str, const char *sub, int trunc)
 char *get_proj_dir(char *command)
 {
 	char *resolved_path = malloc(PATH_MAX);
+	if (!resolved_path) {
+		perror("get_proj_dir: Failed to malloc resolved_path");
+		exit(EXIT_FAILURE);
+	}
 	realpath(command, resolved_path);
 	return strremove(resolved_path, "/bin", 1);
 }
@@ -120,9 +124,18 @@ char *parse_pattern_choice(void)
 	choice--; /* map 1:n to 0:n-1 for array indexing */
 
 	pattern_rel_path = malloc(strlen(pattern_choices[choice]));
+	if (!pattern_rel_path) {
+		perror("parse_pattern_choice: Failed to malloc pattern_rel_path");
+		exit(EXIT_FAILURE);
+	}
 	strcpy(pattern_rel_path, pattern_choices[choice]);
 
 	pattern_path = malloc(strlen(proj_dir) + strlen(pattern_rel_path) + 1);
+	if (!pattern_path) {
+		perror("parse_pattern_choice: Failed to malloc pattern_path");
+		free(pattern_rel_path);
+		exit(EXIT_FAILURE);
+	}
 	strcpy(pattern_path, proj_dir);
 	strcat(pattern_path, pattern_rel_path);
 
@@ -233,6 +246,10 @@ void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int font_
 	char font_rel_path[] = "/data/assets/Arial.ttf";
 
 	font_path = malloc(strlen(proj_dir) + strlen(font_rel_path) + 1);
+	if (!font_path) {
+		perror("display_text: Failed to malloc font_path");
+		exit(EXIT_FAILURE);
+	}
 	strcpy(font_path, proj_dir);
 	strcat(font_path, font_rel_path);
 

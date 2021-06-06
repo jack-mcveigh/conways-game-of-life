@@ -118,6 +118,9 @@ int main(int argc, char *argv[])
 						case SDLK_q:
 							done = 1;
 							break;
+						case SDLK_e:
+							export_body(body, generation, population);
+							break;
 					}
 					break;
 			}

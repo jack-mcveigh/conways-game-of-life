@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <sys/stat.h>
+#include <limits.h>
+#include <time.h>
 #include <SDL.h>
 #include <SDL_ttf.h>
 
@@ -334,4 +337,47 @@ void compute_generation(body_t *body_new, body_t *body_old, int *pop)
 		}
 	}
 
+}
+
+void export_body(body_t *body, int generation, int population)
+{
+	FILE *export_fd;
+	int x, y;
+	char export_file[PATH_MAX];
+	time_t t = time(NULL);
+  	struct tm tm = *localtime(&t);
+	char *export_rel_path = "/data/patterns/export";
+	char *export_path = malloc(strlen(proj_dir) + strlen(export_rel_path) + 1);
+	if (!export_path) {
+		perror("export_body: Failed to malloc export_path");
+		exit(EXIT_FAILURE);
+	}
+
+	strcpy(export_path, proj_dir);
+	strcat(export_path, export_rel_path);
+
+	mkdir(export_path, 0755);
+	sprintf(export_file, "%s/mode%c-n%d-d%d-%d-%02d-%02d-%02d:%02d:%02d.csv",
+		export_path, mode, cell_meta.rows, cell_meta.height, tm.tm_year + 1900,
+		tm.tm_mon + 1, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_sec);
+
+	export_fd = fopen(export_file, "w");
+	if (!export_fd) {
+		perror("export_body: Error writing export file");
+		goto destroy_and_exit;
+	}
+
+	fprintf(export_fd, "x,y\n");
+	for (x=0; x < body->cols; x++) {
+		for (y=0; y < body->rows; y++) {
+			if (body->cells[x * body->cols + y]->alive)
+				fprintf(export_fd, "%d,%d\n", x, y);
+		}
+	}
+
+	fprintf(stderr, "Export located at %s\n", export_file);
+
+	fclose(export_fd);
+destroy_and_exit:
+	free(export_path);
 }

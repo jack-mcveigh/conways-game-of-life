@@ -54,5 +54,6 @@ static body_t *pattern_mode(body_t *body, int *pop);
 static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body, int *pop);
 body_t *inital_generation(SDL_Renderer *renderer, body_t *body, int *pop);
 void compute_generation(body_t *body, body_t *body_old, int *pop);
+void export_body(body_t *body, int generation, int population);
 
 #endif /* _CELL_H_ */
