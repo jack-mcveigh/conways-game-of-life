@@ -229,6 +229,9 @@ static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body, int *pop)
 	SDL_Event event;
 	SDL_Color color = {0, 0, 0}; /* black */
 	char text[] = "DRAWING MODE";
+	int temp = cell_meta.grid_on;
+
+	cell_meta.grid_on = 1;
 
 	SDL_RenderClear(renderer);
 	draw_generation(renderer, body);
@@ -271,6 +274,8 @@ static body_t *drawing_mode(SDL_Renderer *renderer, body_t *body, int *pop)
 					break;
 			}
 	}
+
+	cell_meta.grid_on = temp;
 	return body;
 }
 
