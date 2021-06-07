@@ -65,19 +65,19 @@ char *get_proj_dir(char *command)
  */
 static void print_usage(void)
 {
-        printf("./game_of_life [ -h | [-n] [-d] ]\n");
+        printf("usage: ./game_of_life [-h | [-sgn:d:p:c:b:m:]]\n");
+	printf("\t: - needs value\n");
         printf("optional arguments:\n");
         printf("\t-h\t\t: Print the usage statement.\n");
 	printf("\t-s\t\t: Stepper mode, pause after each frame.\n");
+	printf("\t-g\t\t: Grid on.\n");
         printf("\t-n\t\t: Number of cells. (nxn)\n");
         printf("\t-d\t\t: Dimensions of the body matrix. (dxd)\n");
 	printf("\t-p\t\t: Probability of cell being alive. (p%%)\n");
 	printf("\t-c\t\t: Set cell color. (0xRRGGBB)\n");
 	printf("\t-b\t\t: Set background color. (0xRRGGBB)\n");
-	printf("\t-g\t\t: Grid on.\n");
 	printf("\t-m\t\t: Select mode. (r: random, p: pattern, d: drawing)\n");
 }
-
 
 /*
  * Function:	print_patterns
@@ -142,7 +142,6 @@ char *parse_pattern_choice(void)
 	return pattern_path;
 }
 
-
 /*
  * Function:	parse_input
  * ------------------------
@@ -189,29 +188,34 @@ void parse_input(int argc, char *argv[])
 			case 'm': /* Background color */
 				mode = optarg[0];
 				if (mode != 'r' && mode != 'p' && mode != 'd') { /* Invalid mode */
-					fprintf(stderr, "Not a valid option (valid options are r: random, p: pattern, d: drawing).\n");
+					fprintf(stderr, "game_of_life: not a valid option (valid options are r: random, p: pattern, d: drawing).\n");
 					goto usage_and_exit;
 				}
 				break;
 			case ':': /* Needs value */
-				fprintf(stderr, "Option needs value.\n");
+				fprintf(stderr, "game_of_life: option needs value.\n");
 				goto usage_and_exit;
 			case '?': /* Unknown */
-				fprintf(stderr, "Invalid option.\n");
+				fprintf(stderr, "game_of_life: invalid option.\n");
 				goto usage_and_exit;
 		}
 	}
 
-	if ((cell_meta.width * cell_meta.cols != WINDOW_WIDTH)
-	    || (cell_meta.height * cell_meta.rows != WINDOW_HEIGHT)) {/* Invalid cell dims. */
-		printf("%d * %d = %d, %d * %d = %d\n", cell_meta.width, cell_meta.cols, cell_meta.width * cell_meta.cols, cell_meta.height, cell_meta.rows, cell_meta.height * cell_meta.rows);
+	bg_meta.width = cell_meta.width * cell_meta.cols;
+	bg_meta.height = cell_meta.height * cell_meta.rows;
+
+	if ((bg_meta.width > MAX_WINDOW_WIDTH) || (bg_meta.height > MAX_WINDOW_HEIGHT) ||
+	    (bg_meta.width < MIN_WINDOW_WIDTH) || (bg_meta.height < MIN_WINDOW_HEIGHT) ) { /* Invalid cell dims. */
+		fprintf(stderr, "game_of_life: invalid window size (too small/large)\n");
 		goto usage_and_exit;
 	}
-	else if ((cell_meta.alive_prob > 100) || (cell_meta.alive_prob < 0)) /* Prob. must be percentage 0-100 */
+	else if ((cell_meta.alive_prob > 100) || (cell_meta.alive_prob < 0)) { /* Prob. must be percentage 0-100 */
+		fprintf(stderr, "game_of_life: probability value must be a 0-100\n");
 		goto usage_and_exit;
+	}
 
 	for(; optind < argc; optind++) { /* Extra args */
-		fprintf(stderr, "Invalid option %s.\n", argv[optind]);
+		fprintf(stderr, "game_of_life: invalid option %s.\n", argv[optind]);
 		goto usage_and_exit;
 	}
 
