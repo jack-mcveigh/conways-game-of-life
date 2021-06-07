@@ -153,9 +153,7 @@ char *parse_pattern_choice(void)
  */
 void parse_input(int argc, char *argv[])
 {
-	int option, n, d;
-	n = 0;
-	d = 0;
+	int option;
 
 	proj_dir = get_proj_dir(argv[0]);
 
@@ -170,11 +168,9 @@ void parse_input(int argc, char *argv[])
 				cell_meta.grid_on = 1;
 				break;
 			case 'n': /* Number of cells */
-				n = 1;
 				cell_meta.rows = cell_meta.cols = atoi(optarg);
 				break;
 			case 'd': /* Cell dimensions */
-				d = 1;
 				cell_meta.width = cell_meta.height = atoi(optarg);
 				break;
 			case 'p': /* Alive Probability */
@@ -206,9 +202,11 @@ void parse_input(int argc, char *argv[])
 		}
 	}
 
-	if ((cell_meta.width * cell_meta.rows != WINDOW_WIDTH)
-	    || (cell_meta.height * cell_meta.cols != WINDOW_HEIGHT)) /* Invalid cell dims. */
+	if ((cell_meta.width * cell_meta.cols != WINDOW_WIDTH)
+	    || (cell_meta.height * cell_meta.rows != WINDOW_HEIGHT)) {/* Invalid cell dims. */
+		printf("%d * %d = %d, %d * %d = %d\n", cell_meta.width, cell_meta.cols, cell_meta.width * cell_meta.cols, cell_meta.height, cell_meta.rows, cell_meta.height * cell_meta.rows);
 		goto usage_and_exit;
+	}
 	else if ((cell_meta.alive_prob > 100) || (cell_meta.alive_prob < 0)) /* Prob. must be percentage 0-100 */
 		goto usage_and_exit;
 
