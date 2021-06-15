@@ -290,6 +290,7 @@ void display_text(SDL_Renderer *renderer, char *text, SDL_Color color, int font_
 		exit(EXIT_FAILURE);
 	}
 
+	TTF_CloseFont(font);
 	SDL_FreeSurface(surface_message);
 	SDL_DestroyTexture(texture_message);
 }

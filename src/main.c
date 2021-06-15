@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	}
 
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-	if (!window) {
+	if (!renderer) {
 		perror("main: Failed to create renderer");
 		goto destrory_renderer_exit;
 	}
